@@ -13,7 +13,7 @@ export SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
 source "$SHELLTASK_LIBS/shelltask_functions.sh"
 
 task_name="$1"
-task_file="$SHELLTASK_TASKS/$task_name.sh"
+task_file="$SHELLTASK_TASKS/$task_name.task.sh"
 
 if [[ -r $task_file ]]
 then

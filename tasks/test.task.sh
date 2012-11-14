@@ -6,7 +6,6 @@
 ### exposed subcommands
 
 function test_help() { # display this help
-	$LIB_DIR/synopsis.sh $0
 	echo "repo without subcommand runs ${bluef}status${reset}"
 }
 
