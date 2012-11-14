@@ -6,9 +6,11 @@
 # [$2 => task sub-command to call]
 # [$+ => task sub-command options]
 
-SHELLTASK_ROOT=$(dirname $0)
-SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
+export SHELLTASK_ROOT=$(dirname $0)
+export SHELLTASK_LIBS="$SHELLTASK_ROOT/libs"
+export SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
 
+source "$SHELLTASK_LIBS/shelltask_functions.sh"
 
 task_name="$1"
 task_file="$SHELLTASK_TASKS/$task_name.sh"
@@ -48,5 +50,5 @@ then
 		$0 $task_name help
 	fi
 else
-	echo "${redf} ✗ could not find $task_name task${reset}"
+	echo "${redf} ✗ could not find task: $task_name${reset}"
 fi
