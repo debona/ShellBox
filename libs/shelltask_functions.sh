@@ -3,7 +3,6 @@
 # This script must be sourced!
 # Tasks management functions library.
 
-
 # Compatibility:
 #	bash (sourced and subshell)
 #	zsh  (sourced and subshell)
@@ -16,12 +15,19 @@ fi
 
 source "$SHELLTASK_LIBS/ui.sh"
 
+
+# TODO : create a public task helper library for developers
+# TODO : create an auto-completion library
+# TODO : create a private task management library
+
+
 ## Print command before run it
 # Allow to do: 'verbose command option && verbose something else'
 #
 #* all parameters are interpreted as command and its options
 function verbose() {
-	echo " > ${cyanf}$@${reset}" && "$@"
+	echo " > ${cyanf}$@${reset}" \
+		&& "$@"
 }
 
 ## Print command before run it

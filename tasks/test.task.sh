@@ -3,6 +3,8 @@
 # test shell task
 
 
+# TODO : test auto-completion pattern
+
 ## Simply test parameters
 # Be carefull with this task... it does nothing
 #
