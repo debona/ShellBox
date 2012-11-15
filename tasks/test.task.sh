@@ -3,17 +3,31 @@
 # test shell task
 
 
-### exposed subcommands
-
-function test_help() { # display this help
+## Simply test parameters
+# Be carefull with this task... it does nothing
+#
+#1 [file] first arg
+#2 [] arg
+function test_help() {
 	echo "repo without subcommand runs ${bluef}status${reset}"
 }
 
-function test_() { # execute all tasks
-	verbose test_test
+
+## Default action
+#
+#1 [file] first arg
+#2 [] arg
+function test_() {
+	verbose test_test "$@"
 }
 
-function test_test() { # print args
+
+## Simply test parameters
+# Be carefull with this task... it does nothing
+#
+#1 [file] first arg
+#2 [] arg
+function test_test() {
 	echo "1 => $1"
 	echo "2 => $2"
 	echo "3 => $3"
