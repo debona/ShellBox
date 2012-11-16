@@ -16,6 +16,7 @@ SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
 
 source "$SHELLTASK_LIBS/shelltask_functions.sh"
 
+
 task_name="$1"
 task_file="$SHELLTASK_TASKS/$task_name.task.sh"
 
@@ -25,21 +26,20 @@ then
 	exit 1
 fi
 
-# load task functions
-source $task_file
+source $task_file # load task functions
 
-command_name="$2"
-function_name="${task_name}_${command_name}"
+cmd_name="$2"
+cmd_function="${task_name}_${cmd_name}"
 
-# if command_name is help
+# if cmd_name is help
 if [[ $2 = "help" ]]
 then
 	# then gerate basic help
 	echo "TODO synopsis $task"
 fi
 
-# if function_name can be called (i.e. a function)
-if type $function_name &> /dev/null
+# if cmd_function can be called (i.e. a function)
+if type $cmd_function &> /dev/null
 then
 
 	# http://tldp.org/LDP/abs/html/internalvariables.html#INCOMPAT
@@ -48,11 +48,11 @@ then
 	shift # shift parameter list (remove $1 from parameter list)
 	shift
 
-	# now, parameter list does not include $task_name and $command_name
-	$function_name "$@"
+	# now, parameter list does not include $task_name and $cmd_name
+	$cmd_function "$@"
 else
 	# else print repo help
-	echo "$task_name ${redf}$command_name${reset} does not exist!"
+	echo "$task_name ${redf}$cmd_name${reset} does not exist!"
 
 	# Recursive call to help sub-command
 	$0 $task_name help
