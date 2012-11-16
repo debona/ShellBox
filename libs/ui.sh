@@ -38,33 +38,55 @@ function initializeANSI()
 initializeANSI
 
 
-
-
 ## Print command before run it
 # Allow to do: 'verbose command option && verbose something else'
 #
 #* all parameters are interpreted as command and its options
 function verbose() {
-	echo " > ${cyanf}$@${reset}" \
-		&& "$@"
+	print_command "$@"
+
+	# exec the line
+	if "$@"
+	then
+		print_success "$@"
+		return 0
+	else
+		status=$? # remember the exit status
+		print_failure "$@"
+		return $status
+	fi
 }
 
-## Print command before run it
-# Allow to do: 'verbose command option && verbose something else'
+
+## Print the success of the given messages
 #
-#* all parameters are interpreted as command and its options
-function good() {
-	echo "${greenf} ✔ ${reset}$@"
+#* all parameters describe the message
+function print_success() {
+	echo "${greenf}${boldon} ✔ $@${reset}"
 }
 
-## Print command before run it
-# Allow to do: 'verbose command option && verbose something else'
+
+## Print the failure of the given messages
 #
-#* all parameters are interpreted as command and its options
-function bad() {
-	echo "${redf} ✘ ${reset}$@"
+#* all parameters describe the message
+function print_failure() {
+	echo "${redf}${boldon} ✘ $@${reset}"
 }
 
 
+## Print the warning of the given messages
+#
+#* all parameters describe the message
+function print_warning() {
+	echo "${yellowf}${boldon} ⚑ $@${reset}"
+}
+
+
+## Print the execution the given messages
+#
+#* all parameters describe the message
+function print_command() {
+	echo "${cyanf}${boldon} ● $@${reset}"
+}
 
 
