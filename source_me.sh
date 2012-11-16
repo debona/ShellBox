@@ -14,6 +14,15 @@ else
 	SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
 fi
 
+SHELLTASK_LIBS="$SHELLTASK_ROOT/libs"
+
+source "$SHELLTASK_LIBS/ui.sh"
+
+# TODO : create an auto-completion library
+# TODO : source it
+
+
+
 # TODO : create shelltask alias
 # TODO : setup auto-completion
 

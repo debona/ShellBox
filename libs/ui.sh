@@ -1,5 +1,10 @@
-# Part of [MSGShellUtils](github.com/MattiSG/MSGShellUtils)
+#!/bin/bash
+#
+# UI shell script library
+# Define colors
 
+
+# Part of [MSGShellUtils](github.com/MattiSG/MSGShellUtils)
 # From http://www.intuitive.com/wicked/showscript.cgi?011-colors.sh
 # Author: Dave Taylor
 # ANSI Color -- use these variables to easily have different color
@@ -10,8 +15,7 @@
 # Example:
 #	echo "$redf Error!$reset"
 #	echo "$greenf$boldon Finished!$reset"
-
-initializeANSI()
+function initializeANSI()
 {
 	esc=""
 	
@@ -32,3 +36,35 @@ initializeANSI()
 }
 
 initializeANSI
+
+
+
+
+## Print command before run it
+# Allow to do: 'verbose command option && verbose something else'
+#
+#* all parameters are interpreted as command and its options
+function verbose() {
+	echo " > ${cyanf}$@${reset}" \
+		&& "$@"
+}
+
+## Print command before run it
+# Allow to do: 'verbose command option && verbose something else'
+#
+#* all parameters are interpreted as command and its options
+function good() {
+	echo "${greenf} ✔ ${reset}$@"
+}
+
+## Print command before run it
+# Allow to do: 'verbose command option && verbose something else'
+#
+#* all parameters are interpreted as command and its options
+function bad() {
+	echo "${redf} ✘ ${reset}$@"
+}
+
+
+
+
