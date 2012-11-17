@@ -15,5 +15,9 @@ fi
 # Basic UI functions library
 source "$SHELLTASK_LIBS/ui.sh"
 
+# Regex functions library
+source "$SHELLTASK_LIBS/regex.sh"
 
 
+# TODO : test auto-completion pattern
+# TODO : Create an autocompletion library
