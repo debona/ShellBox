@@ -43,7 +43,7 @@ initializeANSI
 #
 #* all parameters are interpreted as command and its options
 function verbose() {
-	print_command "$@"
+	step "$@"
 
 	# exec the line
 	if "$@"

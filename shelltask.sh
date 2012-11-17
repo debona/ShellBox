@@ -39,14 +39,14 @@ cmd_name="$2"
 cmd_function="${task_name}_${cmd_name}"
 
 # if cmd_name is help
-if [[ $2 = "help" ]]
+if [[ "$cmd_name" = "help" ]]
 then
+	source "$SHELLTASK_LIBS/analysis.sh"
 	# TODO then gerate basic help
-	echo "TODO synopsis $task"
-fi
+	verbose file_raw_doc $task_file
 
 # if cmd_function can be called (i.e. a function)
-if type $cmd_function &> /dev/null
+elif type $cmd_function &> /dev/null
 then
 
 	# http://tldp.org/LDP/abs/html/internalvariables.html#INCOMPAT
