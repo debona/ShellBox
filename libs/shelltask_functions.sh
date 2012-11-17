@@ -12,6 +12,7 @@ else
 	SHELLTASK_LIBS="$( cd -P "$( dirname "$0" )" && pwd )"
 fi
 
+# Basic UI functions library
 source "$SHELLTASK_LIBS/ui.sh"
 
 

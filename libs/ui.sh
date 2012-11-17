@@ -48,11 +48,11 @@ function verbose() {
 	# exec the line
 	if "$@"
 	then
-		print_success "$@"
+		success "$@"
 		return 0
 	else
 		status=$? # remember the exit status
-		print_failure "$@"
+		failure "$@"
 		return $status
 	fi
 }
@@ -61,7 +61,7 @@ function verbose() {
 ## Print the success of the given messages
 #
 #* all parameters describe the message
-function print_success() {
+function success() {
 	echo "${greenf}${boldon} ✔ $@${reset}"
 }
 
@@ -69,7 +69,8 @@ function print_success() {
 ## Print the failure of the given messages
 #
 #* all parameters describe the message
-function print_failure() {
+function failure() {
+	# TODO : print on stderr
 	echo "${redf}${boldon} ✘ $@${reset}"
 }
 
@@ -77,7 +78,8 @@ function print_failure() {
 ## Print the warning of the given messages
 #
 #* all parameters describe the message
-function print_warning() {
+function warning() {
+	# TODO : print on stderr
 	echo "${yellowf}${boldon} ⚑ $@${reset}"
 }
 
@@ -85,7 +87,7 @@ function print_warning() {
 ## Print the execution the given messages
 #
 #* all parameters describe the message
-function print_command() {
+function step() {
 	echo "${cyanf}${boldon} ● $@${reset}"
 }
 

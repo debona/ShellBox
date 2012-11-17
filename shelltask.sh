@@ -22,7 +22,7 @@ task_file="$SHELLTASK_TASKS/$task_name.task.sh"
 
 if [[ ! -r $task_file ]]
 then
-	bad "could not find task: ${redf}$task_name"
+	failure "could not find task: ${redf}$task_name"
 	exit 1
 fi
 
