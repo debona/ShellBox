@@ -26,7 +26,14 @@ then
 	exit 1
 fi
 
-source $task_file # load task functions
+if source $task_file 2> /dev/null
+then
+	echo -n ''
+else
+	failure "Can't load $task_file:"
+	source $task_file
+	exit 1
+fi
 
 cmd_name="$2"
 cmd_function="${task_name}_${cmd_name}"
@@ -34,7 +41,7 @@ cmd_function="${task_name}_${cmd_name}"
 # if cmd_name is help
 if [[ $2 = "help" ]]
 then
-	# then gerate basic help
+	# TODO then gerate basic help
 	echo "TODO synopsis $task"
 fi
 
