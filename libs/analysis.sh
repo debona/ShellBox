@@ -28,8 +28,8 @@ function file_raw_doc() {
 ## Extract the command raw documentation
 # Raw documentation means concerned comment lines
 #
-# @param the task file
-# @param the command name
+# @param task_file the task file
+# @param cmd_name the command name
 function command_raw_doc() {
 	task_file="$1"
 	task_name="$(basename $task_file .task.sh)"
@@ -51,6 +51,44 @@ function extract_commands() {
 
 	egrep "$regex" "$task_file" | sed -E "s:$regex:\2:g"
 }
+
+
+## Extract command parameters
+# Format: @param(s)? {completion_function} name description of the parameter
+#
+# @param {file} task_file the task file
+# @param cmd_name the command name
+function command_raw_params() {
+	task_file="$1"
+	cmd_name="$2"
+
+	regex="#$SPACE*(@param(s)?$SPACE+.*)$"
+
+	command_raw_doc "$task_file" "$cmd_name" | egrep "$regex" | sed -E "s:$regex:\1:g"
+}
+
+
+## Extract command parameter names as single line
+# Format: param1 param2*
+# Star * marks variable arity
+#
+# @param {file} task_file the task file
+# @param cmd_name the command name
+function command_params_line() {
+	task_file="$1"
+	cmd_name="$2"
+
+	comp_func="\{[^\}]*\}" # match the completion function
+	param="[^ 	]+" # match the first word after @param
+
+	regex="($SPACE+${comp_func})?$SPACE+(${param}).*$"
+
+	command_raw_params "$task_file" "$cmd_name" \
+		| sed -E "s:@param$regex: \2:g" \
+		| sed -E "s:@params$regex: \2${yellowf}*${reset}:g" \
+		| tr -d '\n'
+}
+
 
 ## Generate the file documentation
 #
@@ -80,28 +118,34 @@ function task_doc() {
 
 	commands=$(extract_commands $task_file)
 
+	echo
 	echo "NAME"
 	echo "	${purplef}$task_name${reset} -$short"
 
+	echo
 	echo "SYNOPSIS"
 	# TODO : default command
 	for command in $commands
 	do
-		# TODO : extract command params
-		echo "	${purplef}$task_name${reset} ${bluef}$command${reset} options"
+		params=$(command_params_line "$task_file" "$command")
+		echo "	${purplef}$task_name${reset} ${bluef}$command${reset}$params"
 	done
 
+	echo
 	echo "DESCRIPTION"
 	echo "$description"
 
+	echo
 	echo "COMMANDS"
 	# TODO : default command
 	for command in $commands
 	do
 		echo
 		# TODO : command_doc
-		echo "	${bluef}$command${reset}"
-		command_raw_doc $task_file $command | sed -E "s/^#[# 	]*(.*)$/		\1/g"
+		params=$(command_params_line "$task_file" "$command")
+		echo "	${purplef}$task_name${reset} ${bluef}$command${reset}$params"
+		command_raw_doc "$task_file" "$command" | sed -E "s/^#[# 	]*(.*)$/		\1/g"
+		command_raw_params "$task_file" "$command"
 	done
 }
 

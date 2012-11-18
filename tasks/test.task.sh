@@ -19,7 +19,7 @@ function test_() {
 
 ## Display all args on one line
 #
-# @params args to display
+# @params args args to display
 function test_oneline () {
 	step "Print all parameters in one line:"
 	success "$@"
@@ -27,9 +27,9 @@ function test_oneline () {
 
 ## Print one parameter by line
 #
-# @param printed on the first line
+# @param $1 printed on the first line
 # ...
-# @param printed on the last line
+# @param $n printed on the last line
 function test_multiline() {
 	step "Print one parameter by line"
 	if [[ -z $1 ]]
