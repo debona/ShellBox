@@ -7,7 +7,7 @@
 ## Default command
 # Default command cannot have parameters!
 function test_() {
-	if [[ "$1" = "" ]]
+	if [[ -z $1 ]]
 	then
 		success "There are no parameters"
 		return 0

@@ -16,6 +16,9 @@ SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
 
 source "$SHELLTASK_LIBS/shelltask_functions.sh"
 
+# All this var are reachable by the task functions
+# TODO : standardize this var (uppercase)
+# TODO : declare local var for unreachable var
 
 task_name="$1"
 task_file="$SHELLTASK_TASKS/$task_name.task.sh"
@@ -43,7 +46,7 @@ if [[ "$cmd_name" = "help" ]]
 then
 	source "$SHELLTASK_LIBS/analysis.sh"
 	# TODO then gerate basic help
-	verbose file_raw_doc $task_file
+	task_doc $task_file
 
 # if cmd_function can be called (i.e. a function)
 elif type $cmd_function &> /dev/null
