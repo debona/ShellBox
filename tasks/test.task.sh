@@ -45,7 +45,7 @@ function test_multiline() {
 }
 
 
-# Self-tested function
+## Self-tested function
 # This is a self tested function to assert that analysis can extract
 # Note that this command does not respect any code convention
 # Test to extract the raw documentation of task command

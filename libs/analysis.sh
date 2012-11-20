@@ -14,6 +14,11 @@ fi
 
 source "$SHELLTASK_LIBS/regex.sh"
 
+# Some common pattern used for analysis
+
+comment_line="($SOL#[^$EOL!]*$EOL)" # match a comment line
+
+
 
 ## Extract the file raw documentation
 # Raw documentation means concerned comment lines
@@ -21,7 +26,10 @@ source "$SHELLTASK_LIBS/regex.sh"
 # @param the file
 function file_raw_doc() {
 	task_file="$1"
-	match "$task_file" "($SOL#(![^$EOL]+)?$EOL)*(($SOL#[^$EOL!]*$EOL)+)$BL" 3
+
+	bin_bash_line="($SOL#(![^$EOL]+)?$EOL)" # match `#!/bin/bash` line or empty line
+
+	match "$task_file" "${bin_bash_line}*(${comment_line}+)$BL" 3
 }
 
 
@@ -36,7 +44,9 @@ function command_raw_doc() {
 	cmd_name="$2"
 	function_name=$"${task_name}_${cmd_name}"
 
-	match "$task_file" "(($SOL#[^$EOL]*$EOL)+)$SOL($EOL$SOL)*$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
+	special_comment_line="($SOL##[^$EOL]*$EOL)" # match a special comment line like `## special comment`
+
+	match "$task_file" "(${special_comment_line}${comment_line}*)($BL)*$SOL$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
 }
 
 
