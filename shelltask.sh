@@ -46,7 +46,7 @@ if [[ "$cmd_name" = "help" ]]
 then
 	source "$SHELLTASK_LIBS/analysis.sh"
 	# TODO then gerate basic help
-	task_doc $task_file
+	task_doc $task_file # | less -R
 
 # if cmd_function can be called (i.e. a function)
 elif type $cmd_function &> /dev/null
