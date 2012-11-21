@@ -11,6 +11,9 @@ SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
 
 
 SHELLTASK_LIBS="$SHELLTASK_ROOT/libs"
+
+# TODO : change SHELLTASK_TASKS to a SHELLTASK_PATH like PATH
+# TODO : create library to manage PATH and taskfile fetching etc
 SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
 
 
@@ -20,6 +23,7 @@ source "$SHELLTASK_LIBS/shelltask_functions.sh"
 # TODO : standardize this var (uppercase)
 # TODO : declare local var for unreachable var
 
+# TODO : should take task_file as first param
 task_name="$1"
 task_file="$SHELLTASK_TASKS/$task_name.task.sh"
 
@@ -29,10 +33,8 @@ then
 	exit 1
 fi
 
-if source $task_file 2> /dev/null
+if ! source $task_file 2> /dev/null
 then
-	echo -n ''
-else
 	failure "Can't load $task_file:"
 	source $task_file
 	exit 1
@@ -64,6 +66,7 @@ else
 	# else print repo help
 	echo "$task_name ${redf}$cmd_name${reset} does not exist!"
 
+	# TODO : don't call help, print available command instead
 	# Recursive call to help sub-command
 	$0 $task_name help
 fi

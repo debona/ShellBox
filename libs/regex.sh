@@ -13,6 +13,9 @@ else
 fi
 
 
+# TODO : create another lib for environments
+# TODO : Add global_default function
+# TODO : Add which system function
 
 ## Define the global if not defined
 #
@@ -33,6 +36,10 @@ global_default EL "$SOL$EOL"
 global_default SPACE "[ 	]"
 global_default BL "$SOL$SPACE*$EOL"
 
+
+
+# TODO : Make it more generic
+# TODO : Support input pipe
 
 ## Match a regex in a file
 # 

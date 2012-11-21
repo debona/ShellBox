@@ -18,7 +18,8 @@ source "$SHELLTASK_LIBS/regex.sh"
 
 comment_line="($SOL#[^$EOL!]*$EOL)" # match a comment line
 
-
+# TODO : Standardize libraries (i.e. function names...)
+# TODO : Extract documentation from libraries
 
 ## Extract the file raw documentation
 # Raw documentation means concerned comment lines

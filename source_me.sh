@@ -16,6 +16,8 @@ fi
 
 SHELLTASK_LIBS="$SHELLTASK_ROOT/libs"
 
+# TODO : Manage multiple SHELLTASK_PATH
+
 source "$SHELLTASK_LIBS/ui.sh"
 
 # TODO : create an auto-completion library
@@ -27,11 +29,6 @@ source "$SHELLTASK_LIBS/ui.sh"
 # TODO : setup auto-completion
 
 # TODO : for each task file
-#			display the help
+#			create short alias
+#			setup auto-completion
 
-if [[ "$1" == "short" ]]
-then
-	# TODO : for each task
-	#			create short alias
-	#			setup auto-completion
-fi
