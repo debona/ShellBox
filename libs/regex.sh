@@ -37,29 +37,36 @@ global_default SPACE "[ 	]"
 global_default BL "$SOL$SPACE*$EOL"
 
 
-
-# TODO : Make it more generic
-# TODO : Support input pipe
-
-## Match a regex in a file
+## Match a regex in stdin or a file
 # 
 # Each line of the given file is surrounded by Start Of Line and End Of Line markers
 # These markers are define by global var
+# ⚠  if stdout is a tty then a newline is append for convenience
 #
-# @param the task file
-# @param the regex to match
-# @param the group to print, default is group 0
+# @param [input_file] the file to read
+# @param regex the regex to match
+# @param [group=0] the group to print
 function match() {
-	task_file="$1"
-	regex=$2
-	index=${3:-'0'}
+	local file_content
 
-	if [[ ! -r $task_file ]]
-	then
-		return 1
+	if [[ -t 0 ]]
+	then # match stdin is a tty
+		local input_file="$1"
+		if ! [[ -r $input_file ]]
+		then # not piped and no readable input_file
+			return 1
+		else
+			file_content=$( cat $input_file )
+			shift
+		fi
+	else # match stdin is piped
+		file_content=$( cat )
 	fi
 
-	file_content=`cat $task_file | sed -E "s/(.*)/$SOL\1$EOL/g" | tr -d '\n'`
+	file_content=$( echo "$file_content" | sed -E "s/(.*)/$SOL\1$EOL/g" | tr -d '\n' )
+
+	regex=$1
+	index=${2:-'0'}
 
 	if [[ $file_content =~ $regex ]]
 	then
