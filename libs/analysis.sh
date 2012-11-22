@@ -21,109 +21,128 @@ comment_line="($SOL#[^$EOL!]*$EOL)" # match a comment line
 # TODO : Standardize libraries (i.e. function names...)
 # TODO : Extract documentation from libraries
 
-## Extract the file raw documentation
-# Raw documentation means concerned comment lines
+# TODO : generecize for library documentation usage
+
+
+
+## Extracts the file raw documentation
+# The raw documentation means comment lines right after /bin/bash.
 #
-# @param the file
+# @stdin	file_content	the file to analyse
 function file_raw_doc() {
-	task_file="$1"
+	local file_content
+	[[ -t 0 ]] || file_content=$( cat )
 
 	bin_bash_line="($SOL#(![^$EOL]+)?$EOL)" # match `#!/bin/bash` line or empty line
 
-	match "$task_file" "${bin_bash_line}*(${comment_line}+)$BL" 3
+	echo "$file_content" | match "${bin_bash_line}*(${comment_line}+)$BL" 3
 }
 
 
-## Extract the command raw documentation
-# Raw documentation means concerned comment lines
+## Extracts the function raw documentation
+# The raw documentation means these comment lines (just above the function).
 #
-# @param task_file the task file
-# @param cmd_name the command name
-function command_raw_doc() {
-	task_file="$1"
-	task_name="$(basename $task_file .task.sh)"
-	cmd_name="$2"
-	function_name=$"${task_name}_${cmd_name}"
+# @stdin	file_content	the file to analyse
+# @param	function_name	the function name
+function function_raw_doc() {
+	local file_content
+	[[ -t 0 ]] || file_content=$( cat )
+
+	function_name="$1"
 
 	special_comment_line="($SOL##[^$EOL]*$EOL)" # match a special comment line like `## special comment`
 
-	match "$task_file" "(${special_comment_line}${comment_line}*)($BL)*$SOL$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
+	echo "$file_content" | match "(${special_comment_line}${comment_line}*)($BL)*$SOL$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
 }
 
 
-## Extract commands from a task file
+## Extracts commands from a task file
 #
-# @param the task file
+# @stdin [file_content] the file to analyse
+# @param file_or_name the task file to analyse, or its name if the file is piped in
 function extract_commands() {
-	task_file="$1"
-	task_name="$(basename $task_file .task.sh)"
+	local file_content
+	local task_name
+
+	if [[ -t 0 ]]
+	then
+		file_content=$( cat "$1" )
+		task_name="$(basename "$1" .task.sh)"
+	else
+		file_content=$( cat )
+		task_name="$1"
+	fi
 
 	regex="^(function$SPACE+)?${task_name}_([^\( 	]+)$SPACE*\(.*$"
 
-	egrep "$regex" "$task_file" | sed -E "s:$regex:\2:g"
+	echo "$file_content" | egrep "$regex" | sed -E "s:$regex:\2:g"
 }
 
 
-## Extract command parameters
+## Extracts function parameters from a raw function documentation
 # Format: @param(s)? {completion_function} name description of the parameter
 #
-# @param {file} task_file the task file
-# @param cmd_name the command name
-function command_raw_params() {
-	task_file="$1"
-	cmd_name="$2"
+# @stdin	command_raw_doc	the function raw documentation
+function function_raw_params() {
+	local command_raw_doc
+	[[ -t 0 ]] || command_raw_doc=$( cat )
 
 	regex="#$SPACE*(@param(s)?$SPACE+.*)$"
 
-	command_raw_doc "$task_file" "$cmd_name" | egrep "$regex" | sed -E "s:$regex:\1:g"
+	echo "$command_raw_doc" | egrep "$regex" | sed -E "s:$regex:\1:g"
 }
 
 
-## Extract command parameter names as single line
+## Generates the synopsis of a function from raw function parameters
 # Format: param1 param2*
 # Star * marks variable arity
 #
-# @param {file} task_file the task file
-# @param cmd_name the command name
-function command_params_line() {
-	task_file="$1"
-	task_name="$(basename $task_file .task.sh)"
-	cmd_name="$2"
+# @stdin	function_raw_params	the raw function parameters
+function function_synopsis() {
+	local function_raw_params
+	[[ -t 0 ]] || function_raw_params=$( cat )
 
 	comp_func="\{[^\}]*\}" # match the completion function
 	param="[^ 	]+" # match the first word after @param
 
 	regex="($SPACE+${comp_func})?$SPACE+(${param}).*$"
 
-	params=$(command_raw_params "$task_file" "$cmd_name" \
+	params=$(echo "$function_raw_params" \
 		| sed -E "s:@param$regex: \2:g" \
 		| sed -E "s:@params$regex: \2${yellowf}*${reset}${boldon}:g" \
 		| tr -d '\n')
 
-	echo "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}${boldon}$params${reset}"
+	echo "${boldon}$params${reset}"
 }
 
 
 ## Generate the task file documentation
 #
-# @param the task file
+# @stdin the file to analyse
+# @param cmd_name the command name
 function command_doc() {
-	task_file="$1"
-	task_name="$(basename $task_file .task.sh)"
-	cmd_name="$2"
+	local task_file="$1"
+	local file_content=$( cat "$1" )
 
-	command_params_line "$task_file" "$cmd_name"
+	local task_name="$(basename $task_file .task.sh)"
+	local cmd_name="$2"
+	local function_name="${task_name}_${cmd_name}"
+
+	local raw_doc=$( echo "$file_content" | function_raw_doc "$function_name")
+
+	echo -n "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
+	echo "$raw_doc" | function_raw_params | function_synopsis
 
 	comp_func="\{[^\}]*\}" # match the completion function
 	param="[^ 	]+" # match the first word after @param
 
 	regex="($SPACE+${comp_func})?$SPACE+(${param})$SPACE*(.*)$"
 
-	command_raw_params "$task_file" "$cmd_name" \
+	echo "$raw_doc" | function_raw_params "$task_file" "$cmd_name" \
 		| sed -E "s/@param$regex/	${boldon}\2${reset} : \3$/g" \
 		| sed -E "s/@params$regex/	${boldon}\2${yellowf}*${reset} : \3/g"
 
-	command_raw_doc "$task_file" "$cmd_name" \
+	echo "$raw_doc" \
 		| sed -E "/#$SPACE*@param(s)?/d" \
 		| sed -E "s/^#[# 	]*(.*)$/	\1/g" \
 		| sed "/^$SPACE*$/d"
@@ -153,7 +172,11 @@ function task_doc() {
 	task_file="$1"
 	task_name=$(basename $task_file .task.sh)
 
-	description=$(file_raw_doc $task_file | sed -E "s/^#[# 	]*(.*)$/	\1/g")
+	local file_content=$( cat "$task_file" )
+
+	description=$(echo "$file_content" \
+		| file_raw_doc \
+		| sed -E "s/^#[# 	]*(.*)$/	\1/g")
 	short=$(echo "$description" | head -n 1)
 
 	commands=$(extract_commands $task_file)
@@ -167,7 +190,11 @@ function task_doc() {
 	# TODO : default command
 	for command in $commands
 	do
-		command_params_line "$task_file" "$command" | sed -E "s:(.*):	\1:g"
+		local raw_doc=$(echo "$file_content" | function_raw_doc "${task_name}_${command}")
+		echo -n "	${boldon}${purplef}$task_name ${bluef}$command${reset}"
+		echo "$raw_doc" \
+			| function_raw_params \
+			| function_synopsis
 	done
 
 	echo
