@@ -19,13 +19,13 @@ SHELLTASK_TASKS="$SHELLTASK_ROOT/tasks"
 
 source "$SHELLTASK_LIBS/shelltask_functions.sh"
 
-# All this var are reachable by the task functions
+# All this vars are reachable by the task functions
 # TODO : standardize this var (uppercase)
 # TODO : declare local var for unreachable var
 
 # TODO : should take task_file as first param
-task_name="$1"
-task_file="$SHELLTASK_TASKS/$task_name.task.sh"
+task_file="$1"
+task_name=$( basename "$task_file" '.task.sh' )
 
 if [[ ! -r $task_file ]]
 then
@@ -47,7 +47,7 @@ cmd_function="${task_name}_${cmd_name}"
 if [[ "$cmd_name" = "help" ]]
 then
 	source "$SHELLTASK_LIBS/analysis.sh"
-	# TODO then gerate basic help
+	# TODO then generate basic help
 	task_doc $task_file | less -R
 
 # if cmd_function can be called (i.e. a function)
@@ -55,7 +55,7 @@ elif type $cmd_function &> /dev/null
 then
 
 	# http://tldp.org/LDP/abs/html/internalvariables.html#INCOMPAT
-	# be carefull using $* and $@
+	# be careful using $* and $@
 	
 	shift # shift parameter list (remove $1 from parameter list)
 	shift
