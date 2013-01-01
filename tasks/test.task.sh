@@ -9,10 +9,10 @@
 function test_() {
 	if [[ -z $1 ]]
 	then
-		success "There are no parameters"
+		cli_success "There are no parameters"
 		return 0
 	else
-		failure "There is at least one parameter"
+		cli_failure "There is at least one parameter"
 		return 1
 	fi
 }
@@ -21,8 +21,8 @@ function test_() {
 #
 # @params args args to display
 function test_oneline () {
-	step "Print all parameters in one line:"
-	success "$@"
+	cli_step "Print all parameters in one line:"
+	cli_success "$@"
 }
 
 ## Print one parameter by line
@@ -31,14 +31,14 @@ function test_oneline () {
 # ...
 # @param $n printed on the last line
 function test_multiline() {
-	step "Print one parameter by line"
+	cli_step "Print one parameter by line"
 	if [[ -z $1 ]]
 	then
 		warning "There is no parameters"
 	else
 		for i in `seq 1 $#`
 		do
-			success "$i => '$1'"
+			cli_success "$i => '$1'"
 			shift
 		done
 	fi
@@ -51,21 +51,24 @@ function test_multiline() {
 # Test to extract the raw documentation of task command
 
 test_self_tested ( ){
-	source "$SHELLTASK_LIBS/analysis.sh"
-	first_line=$(command_raw_doc "${BASH_SOURCE[0]}" "self_tested" | head -n 1)
-	last_line=$(command_raw_doc "${BASH_SOURCE[0]}" "self_tested" | tail -n 1)
+	source "$SHELLTASK_PATH/analyse.task.sh"
 
-	if [[ "$first_line" != "# Self-tested function" ]]
+	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "test_self_tested")
+
+	local first_line=$(echo "$raw_function_doc" | head -n 1)
+	local last_line=$(echo "$raw_function_doc" | tail -n 1)
+
+	if [[ "$first_line" != "## Self-tested function" ]]
 	then
-		failure "First documentation line not found"
+		cli_failure "First documentation line not found"
 		return 1
 	fi
 
 	if [[ "$last_line" != "# Test to extract the raw documentation of task command" ]]
 	then
-		failure "Last documentation line not found"
+		cli_failure "Last documentation line not found"
 		return 1
 	fi
 
-	success "Documentation found"
+	cli_success "Documentation found"
 }

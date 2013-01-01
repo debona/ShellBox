@@ -13,13 +13,10 @@ else
 	SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
 fi
 
-SHELLTASK_LIBS="$SHELLTASK_ROOT/libs"
-
-source "$SHELLTASK_LIBS/ui.sh"
-source "$SHELLTASK_LIBS/complete.sh"
-
-# TODO : manage multiple paths in SHELLTASK_PATH
 SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
+
+source "$SHELLTASK_PATH/cli.task.sh"
+source "$SHELLTASK_PATH/complete.task.sh"
 
 
 ## autocompletion function called when TAB key is pressed
@@ -74,4 +71,7 @@ for task_file in `find $SHELLTASK_PATH -type f -maxdepth 1 | egrep '.sh$'`
 do
 	load_task "$task_file"
 done
+
+# TODO : manage multiple paths in SHELLTASK_PATH
+
 

@@ -2,16 +2,6 @@
 #
 # Regex functions libraries
 
-# Compatibility:
-#	bash (sourced and subshell)
-#	zsh  (sourced and subshell)
-if [[ -n "$BASH" ]]
-then
-	SHELLTASK_LIBS="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-else
-	SHELLTASK_LIBS="$( cd -P "$( dirname "$0" )" && pwd )"
-fi
-
 
 # TODO : create another lib for environments
 # TODO : Add global_default function
@@ -35,7 +25,7 @@ global_default BL "$SOL$SPACE*$EOL"
 # @param [input_file] the file to read
 # @param regex the regex to match
 # @param [group=0] the group to print
-function match() {
+function regex_match() {
 	local file_content
 
 	if [[ -t 0 ]]

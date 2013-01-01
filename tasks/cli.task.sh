@@ -8,7 +8,7 @@
 ## Print the success of the given messages
 #
 #* all parameters describe the message
-function success() {
+function cli_success() {
 	echo "${greenf}${boldon} ✔ $@${reset}"
 }
 
@@ -16,7 +16,7 @@ function success() {
 ## Print the failure of the given messages
 #
 #* all parameters describe the message
-function failure() {
+function cli_failure() {
 	# TODO : print on stderr
 	echo "${redf}${boldon} ✘ $@${reset}"
 }
@@ -25,7 +25,7 @@ function failure() {
 ## Print the warning of the given messages
 #
 #* all parameters describe the message
-function warning() {
+function cli_warning() {
 	# TODO : print on stderr
 	echo "${yellowf}${boldon} ⚑ $@${reset}"
 }
@@ -34,7 +34,7 @@ function warning() {
 ## Print the execution the given messages
 #
 #* all parameters describe the message
-function step() {
+function cli_step() {
 	echo "${cyanf}${boldon} ● $@${reset}"
 }
 

@@ -30,15 +30,10 @@ function extract_todos() {
 
 ## List all TODOs of the ShellTask project
 function self_todos() {
-	local SHELLTASK_TASKS=$( dirname "$TASK_FILE" )
-
 	echo "${bluef}${boldon}==================== Root: ====================${reset}"
 	extract_todos $SHELLTASK_ROOT/*.sh
 
-	echo "${bluef}${boldon}==================== Libraries: ===============${reset}"
-	extract_todos $SHELLTASK_LIBS/*.sh
-
 	echo "${bluef}${boldon}==================== Tasks: ====================${reset}"
-	extract_todos $SHELLTASK_TASKS/*.sh
+	extract_todos $SHELLTASK_PATH/*.sh
 }
 

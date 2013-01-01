@@ -8,12 +8,15 @@
 
 
 SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
+SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
 
+source "$SHELLTASK_ROOT/shelltask_functions.sh"
 
-SHELLTASK_LIBS="$SHELLTASK_ROOT/libs"
+initializeANSI
 
+source "$SHELLTASK_PATH/cli.task.sh"
+source "$SHELLTASK_PATH/regex.task.sh"
 
-source "$SHELLTASK_LIBS/shelltask_functions.sh"
 
 # All this vars are reachable by the task functions
 # TODO : standardize this var (uppercase)
@@ -41,9 +44,8 @@ cmd_function="${TASK_NAME}_${cmd_name}"
 # if cmd_name is help
 if [[ "$cmd_name" = "help" ]]
 then
-	source "$SHELLTASK_LIBS/analysis.sh"
-	# TODO then generate basic help
-	task_doc $TASK_FILE | less -R
+	source "$SHELLTASK_PATH/analyse.task.sh"
+	analyse_task_doc $TASK_FILE | less -R
 
 # if cmd_function can be called (i.e. a function)
 elif type $cmd_function &> /dev/null

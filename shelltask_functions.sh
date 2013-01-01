@@ -56,6 +56,7 @@ function dropANSI() {
 	reset=""
 }
 
+
 ## Define the global if not defined
 #
 # @param the name of the global
@@ -67,6 +68,7 @@ function global_default() {
 		export "$1=$2"
 	fi
 }
+
 
 ## Print command before run it
 # Allow to do: 'verbose command option && verbose something else'
@@ -86,22 +88,3 @@ function verbose() {
 		return $status
 	fi
 }
-
-
-# Compatibility:
-#	bash (sourced and subshell)
-#	zsh  (sourced and subshell)
-if [[ -n "$BASH" ]]
-then
-	SHELLTASK_LIBS="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-else
-	SHELLTASK_LIBS="$( cd -P "$( dirname "$0" )" && pwd )"
-fi
-
-initializeANSI
-
-# Basic UI functions library
-source "$SHELLTASK_LIBS/ui.sh"
-
-# Regex functions library
-source "$SHELLTASK_LIBS/regex.sh"
