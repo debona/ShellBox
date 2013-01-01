@@ -12,11 +12,13 @@ then
 else
 	SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
 fi
-
 SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
 
+
+source "$SHELLTASK_ROOT/shelltask_functions.sh"
+source "$SHELLTASK_ROOT/autocompletion.sh"
+
 source "$SHELLTASK_PATH/cli.task.sh"
-source "$SHELLTASK_PATH/complete.task.sh"
 
 
 ## autocompletion function called when TAB key is pressed
@@ -30,7 +32,7 @@ function _complete() {
 	if [ "$COMP_CWORD" -eq 1 ] # if only one word in the line
 	then
 		# try to autocomplete with subcommand
-		COMPREPLY=( $( _list_commands $task_file | egrep "^$current" ) )
+		COMPREPLY=( $( complete_commands $task_file | egrep "^$current" ) )
 	else
 		# TODO extract the completion function of the Nth param
 

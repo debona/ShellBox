@@ -50,21 +50,18 @@ then
 # if cmd_function can be called (i.e. a function)
 elif type $cmd_function &> /dev/null
 then
-
 	# http://tldp.org/LDP/abs/html/internalvariables.html#INCOMPAT
 	# be careful using $* and $@
-	
-	shift # shift parameter list (remove $1 from parameter list)
-	shift
 
-	# now, parameter list does not include $TASK_NAME and $cmd_name
+	shift 2 # now, parameter list does not include $TASK_NAME and $cmd_name
+
 	$cmd_function "$@"
 else
 	# else print repo help
-	echo "$TASK_NAME ${redf}$cmd_name${reset} does not exist!"
+	cli_failure "${purplef}$TASK_NAME ${redf}$cmd_name${reset} does not exist!"
 
-	# TODO : don't call help, print available command instead
-	# Recursive call to help sub-command
-	$0 $TASK_FILE help
+	cmd_list=$($0 "$SHELLTASK_PATH/analyse.task.sh" extract_commands $TASK_FILE)
+	echo "Available commands for this task:"
+	echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
 fi
 
