@@ -6,7 +6,7 @@
 
 ## Default command
 # Default command cannot have parameters!
-function test_() {
+function sample_() {
 	if [[ -z $1 ]]
 	then
 		cli_success "There are no parameters"
@@ -20,7 +20,7 @@ function test_() {
 ## Display all args on one line
 #
 # @params args args to display
-function test_oneline () {
+function sample_oneline () {
 	cli_step "Print all parameters in one line:"
 	cli_success "$@"
 }
@@ -30,7 +30,7 @@ function test_oneline () {
 # @param $1 printed on the first line
 # ...
 # @param $n printed on the last line
-function test_multiline() {
+function sample_multiline() {
 	cli_step "Print one parameter by line"
 	if [[ -z $1 ]]
 	then
@@ -50,10 +50,10 @@ function test_multiline() {
 # Note that this command does not respect any code convention
 # Test to extract the raw documentation of task command
 
-test_self_tested ( ){
+sample_self_tested ( ){
 	source "$SHELLTASK_PATH/analyse.task.sh"
 
-	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "test_self_tested")
+	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "sample_self_tested")
 
 	local first_line=$(echo "$raw_function_doc" | head -n 1)
 	local last_line=$(echo "$raw_function_doc" | tail -n 1)
