@@ -6,62 +6,54 @@
 # [$2 => the task command to call]
 # [$+ => task sub-command options]
 
-
+# All this vars are reachable by the task functions
 SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
 SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
+TASK_FILE="$1"
+TASK_NAME=$( basename "$TASK_FILE" '.task.sh' )
+CMD_NAME="$2"
+
+shift 2 # Remove $TASK_NAME and $CMD_NAME from parameters list
 
 source "$SHELLTASK_ROOT/shelltask_functions.sh"
-
-initializeANSI
-
 source "$SHELLTASK_PATH/cli.task.sh"
 source "$SHELLTASK_PATH/regex.task.sh"
 
+initializeANSI
 
-# All this vars are reachable by the task functions
-# TODO : standardize this var (uppercase)
-# TODO : declare local var for unreachable var
+function shellscript() {
+	if [[ ! -r "$TASK_FILE" ]]
+	then
+		cli_failure "Can't read the file: ${redf}$TASK_FILE${reset}"
+		return 1
+	fi
 
-TASK_FILE="$1"
-TASK_NAME=$( basename "$TASK_FILE" '.task.sh' )
+	if ! source $TASK_FILE 2> /dev/null
+	then
+		cli_failure "Can't load $TASK_FILE:"
+		source $TASK_FILE
+		return 1
+	fi
 
-if [[ ! -r "$TASK_FILE" ]]
-then
-	failure "Can't read the file: ${redf}$TASK_FILE${reset}"
-	exit 1
-fi
+	local cmd_function="${TASK_NAME}_${CMD_NAME}"
 
-if ! source $TASK_FILE 2> /dev/null
-then
-	failure "Can't load $TASK_FILE:"
-	source $TASK_FILE
-	exit 1
-fi
+	if [[ "$CMD_NAME" = "help" ]]
+	then
+		source "$SHELLTASK_PATH/analyse.task.sh"
+		analyse_task_doc $TASK_FILE | less -R
 
-cmd_name="$2"
-cmd_function="${TASK_NAME}_${cmd_name}"
+	elif type $cmd_function &> /dev/null # if cmd_function can be called (i.e. is a function)
+	then
+		$cmd_function "$@"
 
-# if cmd_name is help
-if [[ "$cmd_name" = "help" ]]
-then
-	source "$SHELLTASK_PATH/analyse.task.sh"
-	analyse_task_doc $TASK_FILE | less -R
+	else # Otherwise, print repo help
+		cli_failure "${purplef}$TASK_NAME ${redf}$CMD_NAME${reset} does not exist!"
 
-# if cmd_function can be called (i.e. a function)
-elif type $cmd_function &> /dev/null
-then
-	# http://tldp.org/LDP/abs/html/internalvariables.html#INCOMPAT
-	# be careful using $* and $@
+		local cmd_list=$($0 "$SHELLTASK_PATH/analyse.task.sh" extract_commands $TASK_FILE)
+		echo "Available commands for this task:"
+		echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
+	fi
 
-	shift 2 # now, parameter list does not include $TASK_NAME and $cmd_name
+}
 
-	$cmd_function "$@"
-else
-	# else print repo help
-	cli_failure "${purplef}$TASK_NAME ${redf}$cmd_name${reset} does not exist!"
-
-	cmd_list=$($0 "$SHELLTASK_PATH/analyse.task.sh" extract_commands $TASK_FILE)
-	echo "Available commands for this task:"
-	echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
-fi
-
+shellscript "$@"
