@@ -19,18 +19,19 @@ source "$SHELLTASK_ROOT/shelltask_functions.sh"
 source "$SHELLTASK_PATH/cli.task.sh"
 source "$SHELLTASK_PATH/regex.task.sh"
 
+# TODO : Do not colored when stdout and/or stderr is pipped in a file
 initializeANSI
 
 function shellscript() {
 	if [[ ! -r "$TASK_FILE" ]]
 	then
-		cli_failure "Can't read the file: ${redf}$TASK_FILE${reset}"
+		cli_failure "Can't read the file:" $TASK_FILE
 		return 1
 	fi
 
 	if ! source $TASK_FILE 2> /dev/null
 	then
-		cli_failure "Can't load $TASK_FILE:"
+		cli_failure "Can't load" "$TASK_FILE:"
 		source $TASK_FILE
 		return 1
 	fi
@@ -47,7 +48,8 @@ function shellscript() {
 		$cmd_function "$@"
 
 	else # Otherwise, print repo help
-		cli_failure "${purplef}$TASK_NAME ${redf}$CMD_NAME${reset} does not exist!"
+		cli_failure "This command does not exist:"
+		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
 
 		local cmd_list=$($0 "$SHELLTASK_PATH/analyse.task.sh" extract_commands $TASK_FILE)
 		echo "Available commands for this task:"

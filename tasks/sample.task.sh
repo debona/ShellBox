@@ -34,7 +34,7 @@ function sample_multiline() {
 	cli_step "Print one parameter by line"
 	if [[ -z $1 ]]
 	then
-		warning "There is no parameters"
+		cli_warning "There is no parameters"
 	else
 		for i in `seq 1 $#`
 		do
