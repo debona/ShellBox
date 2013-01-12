@@ -1,19 +1,25 @@
 #!/bin/bash
 #
-# Task analysis library
+# Tasks analysis
+# The main purpose of this task file is to provide needed functions to build up the tasks documentation.
+# It source the regex task file.
 
+# TODO : Allow bold in documentation
+# TODO : Use column instead of tabs to handle correctly the broken line
+# TODO : Support @stdin
+# TODO : Support @stdout, and error code ?
 
 source "$SHELLTASK_PATH/regex.task.sh"
 
-# Some common pattern used for analysis
+# Some common pattern used for analysis:
 
-comment_line="($SOL#[^$EOL!]*$EOL)" # match a comment line
+comment_line="($SOL#[^$EOL!]*$EOL)" # group 1 match a comment line
+bin_bash_line="($SOL#(![^$EOL]+)?$EOL)" # group 1 match the `#!/bin/*` and empty comment line, group 2 is wasted
+special_comment_line="($SOL##[^$EOL]*$EOL)" # group 1 match the trigger comment line which begin by double #
 
-# TODO : Standardize libraries (i.e. function names...)
-# TODO : Extract documentation from libraries
-
-# TODO : generecize for library documentation usage
-
+param_regex="#$SPACE*(@param(s)?$SPACE+.*)$" # group 1 match a parameter declaration line, group 2 is wasted
+comp_func="\{[^\}]*\}" # match the completion function in a parameter declaration line
+param_comp_name="($SPACE+${comp_func})?$SPACE+([^ 	]+)$SPACE*(.*)$" # group 1 match the completion function, group 2 match the parameter name, group 3 match the parameter details
 
 
 ## Extracts the file raw documentation
@@ -23,8 +29,6 @@ comment_line="($SOL#[^$EOL!]*$EOL)" # match a comment line
 function analyse_file_raw_doc() {
 	local file_content
 	[[ -t 0 ]] || file_content=$( cat )
-
-	bin_bash_line="($SOL#(![^$EOL]+)?$EOL)" # match `#!/bin/bash` line or empty line
 
 	echo "$file_content" | regex_match "${bin_bash_line}*(${comment_line}+)$BL" 3
 }
@@ -36,12 +40,9 @@ function analyse_file_raw_doc() {
 # @stdin	file_content	the file to analyse
 # @param	function_name	the function name
 function analyse_function_raw_doc() {
+	local function_name="$1"
 	local file_content
 	[[ -t 0 ]] || file_content=$( cat )
-
-	function_name="$1"
-
-	special_comment_line="($SOL##[^$EOL]*$EOL)" # match a special comment line like `## special comment`
 
 	echo "$file_content" | regex_match "(${special_comment_line}${comment_line}*)($BL)*$SOL$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
 }
@@ -64,8 +65,7 @@ function analyse_extract_commands() {
 		task_name="$1"
 	fi
 
-	regex="^(function$SPACE+)?${task_name}_([^\( 	]+)$SPACE*\(.*$"
-
+	local regex="^(function$SPACE+)?${task_name}_([^\( 	]+)$SPACE*\(.*$"
 	echo "$file_content" | egrep "$regex" | sed -E "s:$regex:\2:g"
 }
 
@@ -78,9 +78,7 @@ function analyse_function_raw_params() {
 	local command_raw_doc
 	[[ -t 0 ]] || command_raw_doc=$( cat )
 
-	regex="#$SPACE*(@param(s)?$SPACE+.*)$"
-
-	echo "$command_raw_doc" | egrep "$regex" | sed -E "s:$regex:\1:g"
+	echo "$command_raw_doc" | egrep "$param_regex" | sed -E "s:$param_regex:\1:g"
 }
 
 
@@ -93,14 +91,9 @@ function analyse_function_synopsis() {
 	local analyse_function_raw_params
 	[[ -t 0 ]] || analyse_function_raw_params=$( cat )
 
-	comp_func="\{[^\}]*\}" # match the completion function
-	param="[^ 	]+" # match the first word after @param
-
-	regex="($SPACE+${comp_func})?$SPACE+(${param}).*$"
-
-	params=$(echo "$analyse_function_raw_params" \
-		| sed -E "s:@param$regex: \2:g" \
-		| sed -E "s:@params$regex: \2${yellowf}*${reset}${boldon}:g" \
+	local params=$(echo "$analyse_function_raw_params" \
+		| sed -E "s:@param$param_comp_name: \2:g" \
+		| sed -E "s:@params$param_comp_name: \2${yellowf}*${reset}${boldon}:g" \
 		| tr -d '\n')
 
 	echo "${boldon}$params${reset}"
@@ -110,7 +103,7 @@ function analyse_function_synopsis() {
 ## Generate the task file documentation
 #
 # @stdin the file to analyse
-# @param cmd_name the command name
+# @param	cmd_name	the command name
 function analyse_command_doc() {
 	local task_file="$1"
 	local file_content=$( cat "$1" )
@@ -124,14 +117,9 @@ function analyse_command_doc() {
 	echo -n "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
 	echo "$raw_doc" | analyse_function_raw_params | analyse_function_synopsis
 
-	comp_func="\{[^\}]*\}" # match the completion function
-	param="[^ 	]+" # match the first word after @param
-
-	regex="($SPACE+${comp_func})?$SPACE+(${param})$SPACE*(.*)$"
-
 	echo "$raw_doc" | analyse_function_raw_params "$task_file" "$cmd_name" \
-		| sed -E "s/@param$regex/	${boldon}\2${reset} : \3$/g" \
-		| sed -E "s/@params$regex/	${boldon}\2${yellowf}*${reset} : \3/g"
+		| sed -E "s/@param$param_comp_name/	${boldon}\2${reset} : \3/g" \
+		| sed -E "s/@params$param_comp_name/	${boldon}\2${yellowf}*${reset} : \3/g"
 
 	echo "$raw_doc" \
 		| sed -E "/#$SPACE*@param(s)?/d" \
@@ -142,13 +130,13 @@ function analyse_command_doc() {
 
 ## Generate the file documentation
 #
-# @param the file
+# @param	task_file	the file
 function analyse_file_doc() {
-	file="$1"
-	file_name=$(basename $file)
+	local file="$1"
+	local file_name=$(basename $file)
 
-	description=$(analyse_file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/	\1/g")
-	short=$(echo "$description" | head -n 1)
+	local description=$(analyse_file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/	\1/g")
+	local short=$(echo "$description" | head -n 1)
 
 	echo "FILE"
 	echo "	${purplef}$file_name${reset} -$short"
@@ -156,21 +144,22 @@ function analyse_file_doc() {
 	echo "$description"
 }
 
+
 ## Generate the task file documentation
 #
-# @param the task file
+# @param	task_file	the task file
 function analyse_task_doc() {
-	task_file="$1"
-	task_name=$(basename $task_file .task.sh)
+	local task_file="$1"
+	local task_name=$(basename $task_file .task.sh)
 
 	local file_content=$( cat "$task_file" )
 
-	description=$(echo "$file_content" \
+	local description=$(echo "$file_content" \
 		| analyse_file_raw_doc \
 		| sed -E "s/^#[# 	]*(.*)$/	\1/g")
-	short=$(echo "$description" | head -n 1)
+	local short=$(echo "$description" | head -n 1)
 
-	commands=$(analyse_extract_commands $task_file)
+	local commands=$(analyse_extract_commands $task_file)
 
 	echo
 	echo "${boldon}NAME${reset}"
