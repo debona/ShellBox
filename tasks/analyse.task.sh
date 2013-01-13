@@ -117,14 +117,15 @@ function analyse_command_doc() {
 	echo -n "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
 	echo "$raw_doc" | analyse_function_raw_params | analyse_function_synopsis
 
-	echo "$raw_doc" | analyse_function_raw_params "$task_file" "$cmd_name" \
-		| sed -E "s/@param$param_comp_name/	${boldon}\2${reset} : \3/g" \
-		| sed -E "s/@params$param_comp_name/	${boldon}\2${yellowf}*${reset} : \3/g"
-
 	echo "$raw_doc" \
 		| sed -E "/#$SPACE*@param(s)?/d" \
 		| sed -E "s/^#[# 	]*(.*)$/	\1/g" \
 		| sed "/^$SPACE*$/d"
+
+	echo "	Parameters:"
+	echo "$raw_doc" | analyse_function_raw_params "$task_file" "$cmd_name" \
+		| sed -E "s/@param$param_comp_name/	- ${boldon}\2${reset} : \3/g" \
+		| sed -E "s/@params$param_comp_name/	- ${boldon}\2${yellowf}*${reset} : \3/g"
 }
 
 
