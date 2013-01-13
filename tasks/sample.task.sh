@@ -1,8 +1,13 @@
 #!/bin/bash
 #
-# Auto-test task file
-# This task file provide some test functions to test ShellTask libraries
-
+# A complete task file sample.
+# This file is sourced by shelltask each time.
+# Shelltask declare the following globals:
+# - SHELLTASK_ROOT: Root directory
+# - SHELLTASK_PATH: Tasks directory
+# - TASK_FILE: Loaded task file (i.e. path/to/sample.task.sh)
+# - TASK_NAME: Loaded task name (i.e. sample)
+# - CMD_NAME: Invoked task command
 
 ## Default command
 # Default command cannot have parameters!
@@ -12,24 +17,27 @@ function sample_() {
 		cli_success "There are no parameters"
 		return 0
 	else
-		cli_failure "There is at least one parameter"
+		cli_failure "There is at least one parameter: $@"
 		return 1
 	fi
 }
 
-## Display all args on one line
+## Display all arguments on a single line
 #
-# @params args args to display
+# @params	args	arguments to display
 function sample_oneline () {
 	cli_step "Print all parameters in one line:"
-	cli_success "$@"
+	if [[ -z $1 ]]
+	then
+		cli_warning "There is no parameters"
+	else
+		cli_success "$@"
+	fi
 }
 
 ## Print one parameter by line
 #
-# @param $1 printed on the first line
-# ...
-# @param $n printed on the last line
+# @params	args	arguments to display
 function sample_multiline() {
 	cli_step "Print one parameter by line"
 	if [[ -z $1 ]]

@@ -37,3 +37,14 @@ function self_todos() {
 	extract_todos $SHELLTASK_PATH/*.sh
 }
 
+# TODO : list all tasks
+
+# TODO : short-alias a task
+
+# TODO : add tasks ?
+
+# TODO : remove tasks ?
+
+# TODO : check task ?
+
+# TODO : detail task ?
