@@ -1,11 +1,22 @@
 #!/bin/bash
 #
-# Regex functions libraries
-
+# Regex matching functions libraries.
+# All the regex commands rely on "line markers". When a file is read, the start and end of line are marked.
+# Why marking start and end of line?
+# Because the =~ bash operator don't care about start and end of line patterns: ^ and $
+#
+# The markers:
+# All End of Line are replaced with $EOL exported var.
+# All Start of Line are replaced with $SOL exported var.
+# In case of conflict with these markers, they can be overridden by exporting $SOL or $EOL in environment vars.
+#
+# Other exported shortcuts:
+# The empty line: $EL ("$SOL$EOL" by default)
+# The whitespace: $SPACE ("[ 	]" by default)
+# The blank line: $BL ("$SOL$SPACE*$EOL" by default)
 
 # TODO : create another lib for environments
-# TODO : Add global_default function
-# TODO : Add which system function
+# TODO : Add a 'which system?' switch mechanism
 
 
 global_default SOL "▶"
@@ -19,9 +30,10 @@ global_default BL "$SOL$SPACE*$EOL"
 ## Match a regex in stdin or a file
 # 
 # Each line of the given file is surrounded by Start Of Line and End Of Line markers
-# These markers are define by global var
-# ⚠  if stdout is a tty then a newline is append for convenience
+# These markers are define by global vars
+# ⚠  if stdout is a tty, then a newline is append for convenience
 #
+# @stdin [the content file]
 # @param [input_file] the file to read
 # @param regex the regex to match
 # @param [group=0] the group to print
@@ -29,7 +41,7 @@ function regex_match() {
 	local file_content
 
 	if [[ -t 0 ]]
-	then # match stdin is a tty
+	then # stdin is a tty
 		local input_file="$1"
 		if ! [[ -r $input_file ]]
 		then # not piped and no readable input_file
@@ -38,18 +50,19 @@ function regex_match() {
 			file_content=$( cat $input_file )
 			shift
 		fi
-	else # match stdin is piped
+	else # stdin is piped
 		file_content=$( cat )
 	fi
 
 	file_content=$( echo "$file_content" | sed -E "s/(.*)/$SOL\1$EOL/g" | tr -d '\n' )
 
-	regex=$1
-	index=${2:-'0'}
+	local regex=$1
+	local index=${2:-'0'}
 
 	if [[ $file_content =~ $regex ]]
 	then
 		echo -n "${BASH_REMATCH[$index]}" | tr -d "$SOL" | tr "$EOL" '\n'
+		[[ -t 1 ]] && echo
 		return 0
 	else
 		return $?
