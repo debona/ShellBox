@@ -19,8 +19,9 @@ source "$SHELLTASK_ROOT/shelltask_functions.sh"
 source "$SHELLTASK_PATH/cli.task.sh"
 source "$SHELLTASK_PATH/regex.task.sh"
 
-# TODO : Do not colored when stdout and/or stderr is pipped in a file
 initializeANSI
+[[ -t 1 ]] || dropANSI
+[[ -t 2 ]] || dropANSI
 
 function shellscript() {
 	if [[ ! -r "$TASK_FILE" ]]
