@@ -3,26 +3,32 @@
 # UI shell script library
 # This task allows to print on stderr and stdout with differents color schemes.
 
+## Print the message with the given color
+#
+# @param	color		the color
+# @param	emphased	is emphased
+# @params	others		is printed with default settings
+function echolor() {
+	local color=$1
+	local first=$2
+	shift 2
+	echo -e "${boldon}${color}$first${reset} $@"
+}
+
 ## Print the success of the given messages
 #
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
 function cli_success() {
-	local first=$1
-	shift
-	echo -e "${greenf}${boldon} ✔ $first${reset} $@"
+	echolor "${greenf} ✔ " "$@"
 }
-
 
 ## Print the failure of the given messages
 #
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
 function cli_failure() {
-	# TODO : print on stderr
-	local first=$1
-	shift
-	echo -e "${redf}${boldon} ✘ $first${reset} $@"
+	echolor "${redf} ✘ " "$@" >&2
 }
 
 
@@ -31,10 +37,7 @@ function cli_failure() {
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
 function cli_warning() {
-	# TODO : print on stderr
-	local first=$1
-	shift
-	echo -e "${yellowf}${boldon} ⚑ $first${reset} $@"
+	echolor "${yellowf} ⚑ " "$@" >&2
 }
 
 
@@ -43,9 +46,7 @@ function cli_warning() {
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
 function cli_step() {
-	local first=$1
-	shift
-	echo -e "${cyanf}${boldon} ● $first${reset} $@"
+	echolor "${cyanf} ● " "$@"
 }
 
 
