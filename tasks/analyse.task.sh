@@ -5,7 +5,6 @@
 # It source the regex task file.
 
 # TODO : Allow bold in documentation
-# TODO : Use column instead of tabs to handle correctly the broken line
 # TODO : Support @stdin
 # TODO : Support @stdout, and error code ?
 
@@ -20,6 +19,25 @@ special_comment_line="($SOL##[^$EOL]*$EOL)" # group 1 match the trigger comment 
 param_regex="#$SPACE*(@param(s)?$SPACE+.*)$" # group 1 match a parameter declaration line, group 2 is wasted
 comp_func="\{[^\}]*\}" # match the completion function in a parameter declaration line
 param_comp_name="($SPACE+${comp_func})?$SPACE+([^ 	]+)$SPACE*(.*)$" # group 1 match the completion function, group 2 match the parameter name, group 3 match the parameter details
+
+tab="      " # Typical offset in man pages
+
+
+## Format a text by prepending a prefix to each lines that fit the console screen width.
+#
+# @stdin	[the text to format]
+# @param	prefix	prefix to prepend to each lines
+# @param	[text]	the text to format
+function format() {
+	local text
+	[[ -t 0 ]] && text="$2" || text=$( cat )
+
+	local console_width=$(tput cols)
+	local prefix="$1"
+	local columns=${#prefix}
+	let "columns = console_width - columns"
+	echo "$text" | fold -s -w $columns | sed -E "s/^(.*)$/$prefix\1/g"
+}
 
 
 ## Extracts the file raw documentation
@@ -83,49 +101,58 @@ function analyse_function_raw_params() {
 
 
 ## Generates the synopsis of a function from raw function parameters
-# Format: param1 param2*
+# Output: function_name param1 param2*
 # Star * marks variable arity
 #
 # @stdin	analyse_function_raw_params	the raw function parameters
+# @param	function_name	the function name to display
 function analyse_function_synopsis() {
 	local analyse_function_raw_params
 	[[ -t 0 ]] || analyse_function_raw_params=$( cat )
+	local function_name="$1"
 
 	local params=$(echo "$analyse_function_raw_params" \
 		| sed -E "s:@param$param_comp_name: \2:g" \
 		| sed -E "s:@params$param_comp_name: \2${yellowf}*${reset}${boldon}:g" \
 		| tr -d '\n')
 
-	echo "${boldon}$params${reset}"
+	echo "$function_name${boldon}$params${reset}"
 }
 
 
-## Generate the task file documentation
+## Generate the task command documentation
 #
-# @stdin the file to analyse
+# @stdin [file_content] the file to analyse
+# @param file_or_name the task file to analyse, or its name if the file is piped in
 # @param	cmd_name	the command name
 function analyse_command_doc() {
-	local task_file="$1"
-	local file_content=$( cat "$1" )
+	local file_content
+	local task_name
 
-	local task_name="$(basename $task_file .task.sh)"
+	if [[ -t 0 ]]
+	then
+		file_content=$( cat "$1" )
+		task_name="$(basename "$1" .task.sh)"
+	else
+		file_content=$( cat )
+		task_name="$1"
+	fi
+
 	local cmd_name="$2"
 	local function_name="${task_name}_${cmd_name}"
 
 	local raw_doc=$( echo "$file_content" | analyse_function_raw_doc "$function_name")
+	local raw_params_doc=$(echo "$raw_doc" | analyse_function_raw_params)
 
-	echo -n "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
-	echo "$raw_doc" | analyse_function_raw_params | analyse_function_synopsis
+	echo "$raw_params_doc" | analyse_function_synopsis "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
 
 	echo "$raw_doc" \
 		| sed -E "/#$SPACE*@param(s)?/d" \
-		| sed -E "s/^#[# 	]*(.*)$/	\1/g" \
+		| sed -E "s/^#[# 	]*(.*)$/\1/g" \
 		| sed "/^$SPACE*$/d"
-
-	echo "	Parameters:"
-	echo "$raw_doc" | analyse_function_raw_params "$task_file" "$cmd_name" \
-		| sed -E "s/@param$param_comp_name/	- ${boldon}\2${reset} : \3/g" \
-		| sed -E "s/@params$param_comp_name/	- ${boldon}\2${yellowf}*${reset} : \3/g"
+	echo -n "$raw_params_doc" \
+		| sed -E "s/@param$param_comp_name/ - ${boldon}\2${reset} : \3/g" \
+		| sed -E "s/@params$param_comp_name/ - ${boldon}\2${yellowf}*${reset} : \3/g"
 }
 
 
@@ -136,13 +163,13 @@ function analyse_file_doc() {
 	local file="$1"
 	local file_name=$(basename $file)
 
-	local description=$(analyse_file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/	\1/g")
+	local description=$(analyse_file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/\1/g")
 	local short=$(echo "$description" | head -n 1)
 
 	echo "FILE"
-	echo "	${purplef}$file_name${reset} -$short"
+	echo "${purplef}$file_name${reset} - $short" | format "${tab}"
 	echo "DESCRIPTION"
-	echo "$description"
+	echo "$description" | format "${tab}"
 }
 
 
@@ -157,37 +184,37 @@ function analyse_task_doc() {
 
 	local description=$(echo "$file_content" \
 		| analyse_file_raw_doc \
-		| sed -E "s/^#[# 	]*(.*)$/	\1/g")
+		| sed -E "s/^#[# 	]*(.*)$/\1/g")
 	local short=$(echo "$description" | head -n 1)
 
 	local commands=$(analyse_extract_commands $task_file)
 
 	echo
 	echo "${boldon}NAME${reset}"
-	echo "	${purplef}${boldon}$task_name${reset} -$short"
+	echo "${purplef}${boldon}$task_name${reset} - $short" | format "${tab}"
 
 	echo
 	echo "${boldon}SYNOPSIS${reset}"
 	# TODO : default command
-	for command in $commands
+	for _command in $commands
 	do
-		local raw_doc=$(echo "$file_content" | analyse_function_raw_doc "${task_name}_${command}")
-		echo -n "	${boldon}${purplef}$task_name ${bluef}$command${reset}"
-		echo "$raw_doc" \
+		echo "$file_content" \
+			| analyse_function_raw_doc "${task_name}_${_command}" \
 			| analyse_function_raw_params \
-			| analyse_function_synopsis
+			| analyse_function_synopsis "${boldon}${purplef}$task_name ${bluef}${_command}${reset}" \
+			| format "${tab}"
 	done
 
 	echo
 	echo "${boldon}DESCRIPTION${reset}"
-	echo "$description"
+	echo "$description" | format "${tab}"
 
 	echo
 	echo "${boldon}COMMANDS${reset}"
 	# TODO : default command
-	for command in $commands
+	for _command in $commands
 	do
-		analyse_command_doc "$task_file" "$command" | sed -E "s:(.*):	\1:g"
+		echo "$file_content" | analyse_command_doc "$task_name" "${_command}" | format "${tab}"
 		echo
 	done
 }
