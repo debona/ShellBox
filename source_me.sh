@@ -29,16 +29,21 @@ function _complete() {
 
 	local task_file="$SHELLTASK_PATH/$task_name.task.sh"
 
-	if [ "$COMP_CWORD" -eq 1 ] # if only one word in the line
+	if [ "$COMP_CWORD" -eq 1 ] # the first parameter is the command
 	then
-		# try to autocomplete with subcommand
 		COMPREPLY=( $( complete_commands $task_file | egrep "^$current" ) )
 	else
-		# TODO extract the completion function of the Nth param
+		local cmd_name="${COMP_WORDS[1]}"
 
-		# if there is more than 2 words
-		# try to autocomplete with files in current directory
-		COMPREPLY=( $( compgen -f $current ) )
+		# The other parameter are 
+		local n=$COMP_CWORD
+		let 'n = n - 1'
+
+		local options=$(complete_option $task_file $cmd_name $n )
+		local status=$?
+		[[ "$status" = "0" ]] && COMPREPLY=( $( echo "$options" | egrep "^$current" ) )
+
+		return $status
 	fi
 }
 
@@ -61,7 +66,7 @@ function load_task() {
 		echo "${boldon} ● ${bluef}$task_name${reset} available"
 
 		# generate autocompletion for this command
-		complete -F _complete "$task_name"
+		complete -o default -F _complete "$task_name"
 		return 0
 	else
 		echo "${redb}${boldon} ✗ couldn't import $1:${reset}"

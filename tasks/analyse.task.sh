@@ -17,8 +17,8 @@ bin_bash_line="($SOL#(![^$EOL]+)?$EOL)" # group 1 match the `#!/bin/*` and empty
 special_comment_line="($SOL##[^$EOL]*$EOL)" # group 1 match the trigger comment line which begin by double #
 
 param_regex="#$SPACE*(@param(s)?$SPACE+.*)$" # group 1 match a parameter declaration line, group 2 is wasted
-comp_func="\{[^\}]*\}" # match the completion function in a parameter declaration line
-param_comp_name="($SPACE+${comp_func})?$SPACE+([^ 	]+)$SPACE*(.*)$" # group 1 match the completion function, group 2 match the parameter name, group 3 match the parameter details
+comp_func="\{([^\}]*)\}" # match the completion function in a parameter declaration line
+param_comp_name="($SPACE+${comp_func})?$SPACE+([^ 	]+)$SPACE*(.*)$" # group 1 is wasted, group 2 match the completion function, group 3 match the parameter name, group 4 match the parameter details
 
 tab="      " # Typical offset in man pages
 
@@ -43,10 +43,11 @@ function format() {
 ## Extracts the file raw documentation
 # The raw documentation means comment lines right after /bin/bash.
 #
-# @stdin	file_content	the file to analyse
+# @stdin	[the content file to analyse]
+# @param	[file]	the file to analyse
 function analyse_file_raw_doc() {
 	local file_content
-	[[ -t 0 ]] || file_content=$( cat )
+	[[ -t 0 ]] && file_content=$(cat $1) || file_content=$( cat )
 
 	echo "$file_content" | regex_match "${bin_bash_line}*(${comment_line}+)$BL" 3
 }
@@ -112,8 +113,8 @@ function analyse_function_synopsis() {
 	local function_name="$1"
 
 	local params=$(echo "$analyse_function_raw_params" \
-		| sed -E "s:@param$param_comp_name: \2:g" \
-		| sed -E "s:@params$param_comp_name: \2${yellowf}*${reset}${boldon}:g" \
+		| sed -E "s:@param$param_comp_name: \3:g" \
+		| sed -E "s:@params$param_comp_name: \3${yellowf}*${reset}${boldon}:g" \
 		| tr -d '\n')
 
 	echo "$function_name${boldon}$params${reset}"
@@ -151,14 +152,14 @@ function analyse_command_doc() {
 		| sed -E "s/^#[# 	]*(.*)$/\1/g" \
 		| sed "/^$SPACE*$/d"
 	echo -n "$raw_params_doc" \
-		| sed -E "s/@param$param_comp_name/ - ${boldon}\2${reset} : \3/g" \
-		| sed -E "s/@params$param_comp_name/ - ${boldon}\2${yellowf}*${reset} : \3/g"
+		| sed -E "s/@param$param_comp_name/ - ${boldon}\3${reset} : \4/g" \
+		| sed -E "s/@params$param_comp_name/ - ${boldon}\3${yellowf}*${reset} : \4/g"
 }
 
 
 ## Generate the file documentation
 #
-# @param	task_file	the file
+# @param	file	the file
 function analyse_file_doc() {
 	local file="$1"
 	local file_name=$(basename $file)
@@ -170,6 +171,11 @@ function analyse_file_doc() {
 	echo "${purplef}$file_name${reset} - $short" | format "${tab}"
 	echo "DESCRIPTION"
 	echo "$description" | format "${tab}"
+
+	# TODO : Handle parameters like a command
+	#	synopsis
+	#	input output
+	#	parameters
 }
 
 

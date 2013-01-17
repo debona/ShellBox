@@ -24,7 +24,8 @@ function sample_() {
 
 ## Display all arguments on a single line
 #
-# @params	args	arguments to display
+# @params	{echo "herp"}	args	arguments to display
+# @params	{echo "derp"}	arg		another arg
 function sample_oneline () {
 	cli_step "Print all parameters in one line:"
 	if [[ -z $1 ]]
