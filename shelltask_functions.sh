@@ -101,13 +101,65 @@ function require() {
 	local oldIFS=$IFS
 	IFS=":"
 
+	local sourced="NO"
 	for path in $SHELLTASK_PATH
 	do
 		local fullpath="$path/$file"
-		[[ -r $fullpath ]] && source $fullpath
+		[[ -r $fullpath ]] && source $fullpath && sourced="YES"
 	done
 
 	IFS=$oldIFS
+
+	if [[ "$sourced" = "NO" ]]
+	then
+		echo "$file cannot be sourced from path: $SHELLTASK_PATH"
+		return 1
+	fi
 }
 
+## Find a task file across all directories present in SHELLTASK_PATH.
+# It print the path of the last sourced task file.
+#
+# @param	file	The file to source
+function locate_taskfile() {
+	local file="$1"
 
+	local oldIFS=$IFS
+	IFS=":"
+
+	local fullpath
+	for path in $SHELLTASK_PATH
+	do
+		[[ -r "$path/$file" ]] && fullpath="$path/$file"
+	done
+
+	IFS=$oldIFS
+
+	echo "$fullpath"
+}
+
+## Load task
+#
+# @param	task_file	The task file
+function load_task() {
+	local task_file="$1"
+	local task_name=$( basename "$task_file" '.task.sh' )
+
+	if ! [[ -r "$task_file" ]]
+	then
+		echo "${redb}${boldon} ✗ could not read $1:${reset}"
+		return 1
+	fi
+
+	if alias "$task_name"="$SHELLTASK_ROOT/shelltask.sh $task_file"
+	then
+		echo "${boldon} ● ${bluef}$task_name${reset} available"
+
+		# generate autocompletion for this command
+		complete -o default -F _complete "$task_name"
+		return 0
+	else
+		echo "${redb}${boldon} ✗ couldn't import $1:${reset}"
+		return 1
+	fi
+}

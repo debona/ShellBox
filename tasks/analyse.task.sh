@@ -151,18 +151,18 @@ function analyse_command_doc() {
 	local function_name="${task_name}_${cmd_name}"
 
 	local raw_doc=$( echo "$file_content" | analyse_function_raw_doc "$function_name")
-	local raw_params_doc=$(echo "$raw_doc" | analyse_function_raw_input)
+	local raw_inputs_doc=$(echo "$raw_doc" | analyse_function_raw_input)
 
-	echo "$raw_params_doc" | analyse_function_synopsis "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
+	echo "$raw_inputs_doc" | analyse_function_synopsis "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
 
 	echo "$raw_doc" \
 		| egrep -v "$input_regex" \
 		| sed -E "s/^#[# 	]*(.*)$/\1/g" \
 		| sed "/^$SPACE*$/d"
-	echo -n "$raw_params_doc" \
+	echo -n "$raw_inputs_doc" \
 		| egrep "^@stdin" \
 		| sed -E "s/@stdin$input_comp_name/ < ${greenf}${boldon}\3${reset} : \4/g"
-	echo -n "$raw_params_doc" \
+	echo -n "$raw_inputs_doc" \
 		| egrep "^@params?" \
 		| sed -E "s/@param$input_comp_name/ - ${boldon}\3${reset} : \4/g" \
 		| sed -E "s/@params$input_comp_name/ - ${boldon}\3${yellowf}*${reset} : \4/g"
