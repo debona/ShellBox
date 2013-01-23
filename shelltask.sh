@@ -8,16 +8,22 @@
 
 # All this vars are reachable by the task functions
 SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
-SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
 TASK_FILE="$1"
 TASK_NAME=$( basename "$TASK_FILE" '.task.sh' )
 CMD_NAME="$2"
 
+
+if [[ -z $SHELLTASK_PATH ]]
+then
+	SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
+fi
+
 shift 2 # Remove $TASK_NAME and $CMD_NAME from parameters list
 
 source "$SHELLTASK_ROOT/shelltask_functions.sh"
-source "$SHELLTASK_PATH/cli.task.sh"
-source "$SHELLTASK_PATH/regex.task.sh"
+
+require "cli.task.sh"
+require "regex.task.sh"
 
 initializeANSI
 [[ -t 1 ]] || dropANSI
@@ -41,7 +47,7 @@ function shellscript() {
 
 	if [[ "$CMD_NAME" = "help" ]]
 	then
-		source "$SHELLTASK_PATH/analyse.task.sh"
+		require "analyse.task.sh"
 		analyse_task_doc $TASK_FILE | less -R
 
 	elif type $cmd_function &> /dev/null # if cmd_function can be called (i.e. is a function)

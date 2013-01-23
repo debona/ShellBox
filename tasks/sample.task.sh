@@ -24,7 +24,7 @@ function sample_() {
 
 ## Display all arguments on a single line
 #
-# @params	{echo "herp"}	args	arguments to display
+# @param	{echo "herp"}	args	arguments to display
 # @params	{echo "derp"}	arg		another arg
 function sample_oneline () {
 	cli_step "Print all parameters in one line:"
@@ -60,7 +60,7 @@ function sample_multiline() {
 # Test to extract the raw documentation of task command
 
 sample_self_tested ( ){
-	source "$SHELLTASK_PATH/analyse.task.sh"
+	require "analyse.task.sh"
 
 	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "sample_self_tested")
 

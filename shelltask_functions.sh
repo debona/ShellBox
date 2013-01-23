@@ -88,3 +88,26 @@ function verbose() {
 		return $status
 	fi
 }
+
+
+## Try to source a file across all directories present in SHELLTASK_PATH.
+# For each directories, if the file can be read, it is sourced.
+# This mechanism allows to override shelltask "private" tasks or commands.
+#
+# @param	file	The file to source
+function require() {
+	local file="$1"
+
+	local oldIFS=$IFS
+	IFS=":"
+
+	for path in $SHELLTASK_PATH
+	do
+		local fullpath="$path/$file"
+		[[ -r $fullpath ]] && source $fullpath
+	done
+
+	IFS=$oldIFS
+}
+
+

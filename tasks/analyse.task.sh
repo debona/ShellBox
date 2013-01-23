@@ -6,7 +6,7 @@
 
 # TODO : Allow bold in documentation
 
-source "$SHELLTASK_PATH/regex.task.sh"
+require "regex.task.sh"
 
 # common patterns used for analysis:
 

@@ -18,8 +18,6 @@ SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
 source "$SHELLTASK_ROOT/shelltask_functions.sh"
 source "$SHELLTASK_ROOT/autocompletion.sh"
 
-source "$SHELLTASK_PATH/cli.task.sh"
-
 
 ## autocompletion function called when TAB key is pressed
 #
