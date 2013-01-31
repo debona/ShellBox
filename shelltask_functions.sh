@@ -90,7 +90,7 @@ function verbose() {
 }
 
 
-## Try to source a file across all directories present in SHELLTASK_PATH.
+## Try to source a file across all directories present in SHELLTASK_DIRS.
 # For each directories, if the file can be read, it is sourced.
 # This mechanism allows to override shelltask "private" tasks or commands.
 #
@@ -102,7 +102,7 @@ function require() {
 	IFS=":"
 
 	local sourced="NO"
-	for path in $SHELLTASK_PATH
+	for path in $SHELLTASK_DIRS
 	do
 		local fullpath="$path/$file"
 		[[ -r $fullpath ]] && source $fullpath && sourced="YES"
@@ -112,12 +112,12 @@ function require() {
 
 	if [[ "$sourced" = "NO" ]]
 	then
-		echo "$file cannot be sourced from path: $SHELLTASK_PATH"
+		echo "$file cannot be sourced from path: $SHELLTASK_DIRS"
 		return 1
 	fi
 }
 
-## Find a task file across all directories present in SHELLTASK_PATH.
+## Find a task file across all directories present in SHELLTASK_DIRS.
 # It print the path of the last sourced task file.
 #
 # @param	file	The file to source
@@ -128,7 +128,7 @@ function locate_taskfile() {
 	IFS=":"
 
 	local fullpath
-	for path in $SHELLTASK_PATH
+	for path in $SHELLTASK_DIRS
 	do
 		[[ -r "$path/$file" ]] && fullpath="$path/$file"
 	done

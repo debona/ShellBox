@@ -34,16 +34,12 @@ function self_todos() {
 	extract_todos $SHELLTASK_ROOT/*.sh
 
 	echo "${bluef}${boldon}==================== Tasks: ====================${reset}"
-	extract_todos $SHELLTASK_PATH/*.sh
+	extract_todos $SHELLTASK_DIRS/*.sh
 }
 
 # TODO : list all tasks
 
 # TODO : short-alias a task
-
-# TODO : add tasks ?
-
-# TODO : remove tasks ?
 
 # TODO : check task ?
 

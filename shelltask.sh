@@ -13,9 +13,9 @@ TASK_NAME=$( basename "$TASK_FILE" '.task.sh' )
 CMD_NAME="$2"
 
 
-if [[ -z $SHELLTASK_PATH ]]
+if [[ -z $SHELLTASK_DIRS ]]
 then
-	SHELLTASK_PATH="$SHELLTASK_ROOT/tasks"
+	SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
 fi
 
 shift 2 # Remove $TASK_NAME and $CMD_NAME from parameters list
@@ -58,7 +58,7 @@ function shellscript() {
 		cli_failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
 
-		local cmd_list=$($0 "$SHELLTASK_PATH/analyse.task.sh" extract_commands $TASK_FILE)
+		local cmd_list=$($0 "$SHELLTASK_DIRS/analyse.task.sh" extract_commands $TASK_FILE)
 		echo "Available commands for this task:"
 		echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
 	fi

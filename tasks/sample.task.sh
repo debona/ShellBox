@@ -4,7 +4,7 @@
 # This file is sourced by shelltask each time.
 # Shelltask declare the following globals:
 # - SHELLTASK_ROOT: Root directory
-# - SHELLTASK_PATH: Tasks directory
+# - SHELLTASK_DIRS: Tasks directory
 # - TASK_FILE: Loaded task file (i.e. path/to/sample.task.sh)
 # - TASK_NAME: Loaded task name (i.e. sample)
 # - CMD_NAME: Invoked task command
