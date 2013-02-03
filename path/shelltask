@@ -6,21 +6,29 @@
 # [$2 => the task command to call]
 # [$+ => task sub-command options]
 
-# All this vars are reachable by the task functions
-SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
-TASK_FILE="$1"
-TASK_NAME=$( basename "$TASK_FILE" '.task.sh' )
-CMD_NAME="$2"
 
-
+SHELLTASK_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 if [[ -z $SHELLTASK_DIRS ]]
 then
 	SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
 fi
 
-shift 2 # Remove $TASK_NAME and $CMD_NAME from parameters list
+
+# All this vars are reachable by the task functions
+if [[ `basename "$0"` = "shelltask" ]]
+then
+	TASK_NAME=$( basename "$1" )
+	CMD_NAME="$2"
+	shift 2 # Remove $TASK_NAME and $CMD_NAME from parameters list
+else
+	TASK_NAME=$( basename "$0" )
+	CMD_NAME="$1"
+	shift 1 # Remove $CMD_NAME from parameters list
+fi
 
 source "$SHELLTASK_ROOT/shelltask_functions.sh"
+TASK_FILE=$( locate_taskfile ${TASK_NAME}.task.sh )
+
 
 require "cli.task.sh"
 require "regex.task.sh"
@@ -29,17 +37,11 @@ initializeANSI
 [[ -t 1 ]] || dropANSI
 [[ -t 2 ]] || dropANSI
 
-function shellscript() {
-	if [[ ! -r "$TASK_FILE" ]]
-	then
-		cli_failure "Can't read the file:" $TASK_FILE
-		return 1
-	fi
+function shelltask() {
 
-	if ! source $TASK_FILE 2> /dev/null
+	if ! require "${TASK_NAME}.task.sh"
 	then
-		cli_failure "Can't load" "$TASK_FILE:"
-		source $TASK_FILE
+		cli_failure "Can't load the task:" "$TASK_NAME:"
 		return 1
 	fi
 
@@ -58,11 +60,12 @@ function shellscript() {
 		cli_failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
 
-		local cmd_list=$($0 "$SHELLTASK_DIRS/analyse.task.sh" extract_commands $TASK_FILE)
+		require "analyse.task.sh"
+		local cmd_list=$( analyse_extract_commands $TASK_FILE)
 		echo "Available commands for this task:"
 		echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
 	fi
 
 }
 
-shellscript "$@"
+shelltask "$@"

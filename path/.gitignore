@@ -1,0 +1,8 @@
+# Ignore all files...
+*
+
+# ... but neither shelltask script
+!shelltask
+
+# nor this gitignore file
+!.gitignore

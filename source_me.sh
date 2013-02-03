@@ -22,7 +22,7 @@ source "$SHELLTASK_ROOT/autocompletion.sh"
 SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
 
 echo "source all task file in $SHELLTASK_DIRS:"
-for task_file in `find $SHELLTASK_DIRS -type f -maxdepth 1 | egrep 'task.sh$'`
+for task_file in `find $SHELLTASK_DIRS -type f | egrep 'task.sh$'`
 do
 	load_task "$task_file"
 done
@@ -36,7 +36,7 @@ do
 		SHELLTASK_DIRS="$SHELLTASK_DIRS:$directory"
 		echo
 		echo "source all task file in $directory:"
-		for task_file in `find $directory -type f -maxdepth 1 | egrep '.sh$'`
+		for task_file in `find $directory -type f | egrep 'task.sh$'`
 		do
 			load_task "$task_file"
 		done
