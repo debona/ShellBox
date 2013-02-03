@@ -91,51 +91,41 @@ function verbose() {
 
 
 ## Try to source a file across all directories present in SHELLTASK_DIRS.
-# For each directories, if the file can be read, it is sourced.
-# This mechanism allows to override shelltask "private" tasks or commands.
+# This mechanism rely on the `locate_taskfile`.
+# Return 1 if the file can't be sourced
 #
 # @param	file	The file to source
 function require() {
 	local file="$1"
+	local fullpath=$( locate_taskfile $file )
 
-	local oldIFS=$IFS
-	IFS=":"
-
-	local sourced="NO"
-	for path in $SHELLTASK_DIRS
-	do
-		local fullpath="$path/$file"
-		[[ -r $fullpath ]] && source $fullpath && sourced="YES"
-	done
-
-	IFS=$oldIFS
-
-	if [[ "$sourced" = "NO" ]]
+	if ! source "$fullpath"
 	then
-		echo "$file cannot be sourced from path: $SHELLTASK_DIRS"
+		echo "$file cannot be sourced from path:"
+		echo "SHELLTASK_DIRS=$SHELLTASK_DIRS"
 		return 1
 	fi
 }
 
 ## Find a task file across all directories present in SHELLTASK_DIRS.
-# It print the path of the last sourced task file.
+# It print the path of the last task file which match.
+# Return 1 if the file can't be found
 #
 # @param	file	The file to source
 function locate_taskfile() {
 	local file="$1"
+	local fullpath
 
 	local oldIFS=$IFS
 	IFS=":"
-
-	local fullpath
 	for path in $SHELLTASK_DIRS
 	do
 		[[ -r "$path/$file" ]] && fullpath="$path/$file"
 	done
-
 	IFS=$oldIFS
 
 	echo "$fullpath"
+	[[ -z "$fullpath" ]] && return 1
 }
 
 ## Load task
@@ -151,7 +141,9 @@ function load_task() {
 		return 1
 	fi
 
-	if alias "$task_name"="$SHELLTASK_ROOT/shelltask.sh $task_file"
+	ln -s "shelltask" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
+
+	if [[ -x "$SHELLTASK_ROOT/path/$task_name" ]]
 	then
 		echo "${boldon} ● ${bluef}$task_name${reset} available"
 
