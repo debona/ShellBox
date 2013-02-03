@@ -18,42 +18,42 @@
 function initializeANSI()
 {
 	esc=""
-	
-	blackf="${esc}[30m";   redf="${esc}[31m";    greenf="${esc}[32m"
-	yellowf="${esc}[33m"   bluef="${esc}[34m";   purplef="${esc}[35m"
-	cyanf="${esc}[36m";    whitef="${esc}[37m"
-	
-	blackb="${esc}[40m";   redb="${esc}[41m";    greenb="${esc}[42m"
-	yellowb="${esc}[43m"   blueb="${esc}[44m";   purpleb="${esc}[45m"
-	cyanb="${esc}[46m";    whiteb="${esc}[47m"
-	
-	boldon="${esc}[1m";    boldoff="${esc}[22m"
-	italicson="${esc}[3m"; italicsoff="${esc}[23m"
-	ulon="${esc}[4m";      uloff="${esc}[24m"
-	invon="${esc}[7m";     invoff="${esc}[27m"
-	
-	reset="${esc}[0m"
+
+	blackf="${esc}[30m";	redf="${esc}[31m";		greenf="${esc}[32m";
+	yellowf="${esc}[33m";	bluef="${esc}[34m";		purplef="${esc}[35m";
+	cyanf="${esc}[36m";		whitef="${esc}[37m";
+
+	blackb="${esc}[40m";	redb="${esc}[41m";		greenb="${esc}[42m";
+	yellowb="${esc}[43m";	blueb="${esc}[44m";		purpleb="${esc}[45m";
+	cyanb="${esc}[46m";		whiteb="${esc}[47m";
+
+	boldon="${esc}[1m";		boldoff="${esc}[22m";
+	italicson="${esc}[3m";	italicsoff="${esc}[23m";
+	ulon="${esc}[4m";		uloff="${esc}[24m";
+	invon="${esc}[7m";		invoff="${esc}[27m";
+
+	reset="${esc}[0m";
 }
 
 ## Drop ANSI colors to write readable log files.
 #
 function dropANSI() {
-	esc=""
-	
-	blackf="";   redf="";    greenf=""
-	yellowf=""   bluef="";   purplef=""
-	cyanf="";    whitef=""
-	
-	blackb="";   redb="";    greenb=""
-	yellowb=""   blueb="";   purpleb=""
-	cyanb="";    whiteb=""
-	
-	boldon="";    boldoff=""
-	italicson=""; italicsoff=""
-	ulon="";      uloff=""
-	invon="";     invoff=""
-	
-	reset=""
+	unset esc
+
+	unset blackf;		unset redf;		unset greenf;
+	unset yellowf;		unset bluef;	unset purplef;
+	unset cyanf;		unset whitef;
+
+	unset blackb;		unset redb;		unset greenb;
+	unset yellowb;		unset blueb;	unset purpleb;
+	unset cyanb;		unset whiteb;
+
+	unset boldon;		unset boldoff;
+	unset italicson;	unset italicsoff;
+	unset ulon;			unset uloff;
+	unset invon;		 unset invoff;
+
+	unset reset;
 }
 
 
