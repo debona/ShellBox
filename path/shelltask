@@ -14,58 +14,84 @@ then
 fi
 
 
-# All this vars are reachable by the task functions
-if [[ `basename "$0"` = "shelltask" ]]
-then
-	TASK_NAME=$( basename "$1" )
-	CMD_NAME="$2"
-	shift 2 # Remove $TASK_NAME and $CMD_NAME from parameters list
-else
-	TASK_NAME=$( basename "$0" )
-	CMD_NAME="$1"
-	shift 1 # Remove $CMD_NAME from parameters list
-fi
 
-source "$SHELLTASK_ROOT/shelltask_functions.sh"
-TASK_FILE=$( locate_taskfile ${TASK_NAME}.task.sh )
+function task_help() {
+	require "cli.task.sh"
+	require "analyse.task.sh"
 
-
-require "cli.task.sh"
-require "regex.task.sh"
-
-initializeANSI
-[[ -t 1 ]] || dropANSI
-[[ -t 2 ]] || dropANSI
-
-function shelltask() {
-
-	if ! require "${TASK_NAME}.task.sh"
-	then
-		cli_failure "Can't load the task:" "$TASK_NAME:"
-		return 1
-	fi
-
-	local cmd_function="${TASK_NAME}_${CMD_NAME}"
-
-	if [[ "$CMD_NAME" = "help" ]]
-	then
-		require "analyse.task.sh"
-		analyse_task_doc $TASK_FILE | less -R
-
-	elif type $cmd_function &> /dev/null # if cmd_function can be called (i.e. is a function)
-	then
-		$cmd_function "$@"
-
-	else # Otherwise, print repo help
-		cli_failure "This command does not exist:"
-		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
-
-		require "analyse.task.sh"
-		local cmd_list=$( analyse_extract_commands $TASK_FILE)
-		echo "Available commands for this task:"
-		echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
-	fi
-
+	local cmd_list=$( analyse_extract_commands $TASK_FILE)
+	echo "Available commands for this task:"
+	echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
 }
 
-shelltask "$@"
+function task_man() {
+	require "analyse.task.sh"
+	analyse_task_doc $TASK_FILE | less -R
+}
+
+
+
+## Print the command function for the given task
+# return 1 if the command does not exist.
+#
+function command_function() {
+	local cmd_function="${TASK_NAME}_${CMD_NAME}"
+	if type $cmd_function &> /dev/null
+	then
+		echo $cmd_function
+		return
+	fi
+
+	cmd_function="task_${CMD_NAME}"
+	if type $cmd_function &> /dev/null
+	then
+		echo $cmd_function
+		return
+	fi
+
+	return 1
+}
+
+function dispatch() {
+	source "$SHELLTASK_ROOT/shelltask_functions.sh"
+
+	initializeANSI
+	[[ -t 1 ]] || dropANSI
+	[[ -t 2 ]] || dropANSI
+
+	# All this vars are reachable by the task functions
+	TASK_NAME=$( basename "$0" ".task.sh" )
+	TASK_FILE=$( locate_taskfile ${TASK_NAME}.task.sh )
+	CMD_NAME="$1"
+	shift
+
+	require "${TASK_NAME}.task.sh" || return 1
+
+	if ! command_function &> /dev/null && [[ "$TASK_NAME" = "shelltask" ]]
+	then
+		TASK_NAME="$CMD_NAME"
+		TASK_FILE=$( locate_taskfile ${TASK_NAME}.task.sh )
+		CMD_NAME="$1"
+		shift
+
+		if ! require "${TASK_NAME}.task.sh" &> /dev/null
+		then
+			require "cli.task.sh"
+			cli_failure ${TASK_NAME} "is neither a task nor a shelltask command"
+			return 1
+		fi
+	fi
+
+	if command_function &> /dev/null
+	then
+		local cmd_function=$( command_function )
+		$cmd_function "$@"
+	else
+		require "cli.task.sh"
+		cli_failure "This command does not exist:"
+		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
+		task_help
+	fi
+}
+
+dispatch "$@"

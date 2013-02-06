@@ -4,5 +4,5 @@
 # ... but neither shelltask script
 !shelltask
 
-# nor this gitignore file
+# ... nor this gitignore file
 !.gitignore
