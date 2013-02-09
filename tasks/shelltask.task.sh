@@ -91,3 +91,13 @@ function shelltask_shortcut() {
 function shelltask_unshortcut() {
 echo
 }
+
+
+local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
+for task_file in `find $task_dirs -type f -name '*.task.sh'`
+do
+	local task_name=$( basename "$task_file" ".task.sh" )
+	eval "function shelltask_$task_name() {
+		task_run $task_name \"\$@\"
+	}"
+done
