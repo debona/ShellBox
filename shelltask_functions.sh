@@ -127,31 +127,3 @@ function locate_taskfile() {
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
 }
-
-## Load task
-#
-# @param	task_file	The task file
-function load_task() {
-	local task_file="$1"
-	local task_name=$( basename "$task_file" '.task.sh' )
-
-	if ! [[ -r "$task_file" ]]
-	then
-		echo "${redb}${boldon} ✗ could not read $1:${reset}"
-		return 1
-	fi
-
-	ln -s "shelltask" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
-
-	if [[ -x "$SHELLTASK_ROOT/path/$task_name" ]]
-	then
-		echo "${boldon} ● ${bluef}$task_name${reset} available"
-
-		# generate autocompletion for this command
-		complete -o default -F _complete "$task_name"
-		return 0
-	else
-		echo "${redb}${boldon} ✗ couldn't import $1:${reset}"
-		return 1
-	fi
-}
