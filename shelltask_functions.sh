@@ -113,16 +113,11 @@ function require() {
 #
 # @param	file	The file to source
 function locate_taskfile() {
-	local file="$1"
-	local fullpath
+	local task_filename="$1"
 
-	local oldIFS=$IFS
-	IFS=":"
-	for path in $SHELLTASK_DIRS
-	do
-		[[ -r "$path/$file" ]] && fullpath="$path/$file"
-	done
-	IFS=$oldIFS
+	# TODO: Create a private function which return all reachable task files
+	local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
+	local fullpath=$( find $task_dirs -type f -name "$task_filename" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
