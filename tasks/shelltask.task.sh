@@ -1,5 +1,40 @@
 #!/bin/bash
 #
+#
+
+##
+#
+#
+function shelltask_() {
+	shelltask_status
+}
+
+
+##
+#
+#
+function shelltask_status() {
+	echo
+	# TODO shelltask is it in the path
+	# TODO info about task dirs
+	# TODO list of all task shortcuted
+}
+
+
+##
+#
+#
+function shelltask_tasks() {
+	require "analyse.task.sh"
+
+	local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
+	for task_file in `find $task_dirs -type f -name '*.task.sh'`
+	do
+		local task_name=$( basename "$task_file" ".task.sh" )
+		local short=$( cat "$task_file" | analyse_file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
+		echo " - ${purplef}${boldon}$task_name${reset} - $short"
+	done
+}
 
 
 ## Create a shortcut for the given task
@@ -49,3 +84,10 @@ function shelltask_shortcut() {
 	fi
 }
 
+
+##
+#
+#
+function shelltask_unshortcut() {
+echo
+}
