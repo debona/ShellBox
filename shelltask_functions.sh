@@ -56,7 +56,6 @@ function dropANSI() {
 	unset reset;
 }
 
-
 ## Define the global if not defined
 #
 # @param the name of the global
@@ -69,6 +68,7 @@ function global_default() {
 	fi
 }
 
+# TODO: put this function into cli
 
 ## Print command before run it
 # Allow to do: 'verbose command option && verbose something else'

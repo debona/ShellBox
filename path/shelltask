@@ -8,18 +8,23 @@
 
 
 SHELLTASK_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
-if [[ -z $SHELLTASK_DIRS ]]
-then
-	SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
-fi
 
+# TODO: Ensure that SHELLTASK_DIRS includes $SHELLTASK_ROOT/tasks
+[[ -z $SHELLTASK_DIRS ]] && SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
 
+# TODO: it would be great to remove this file
 source "$SHELLTASK_ROOT/shelltask_functions.sh"
 
+# Disable color in shell if the outputs are not tty
 initializeANSI
 [[ -t 1 ]] && [[ -t 2 ]] || dropANSI
+
+
+# TODO: move these common commands in a separate task file
+
+##
+#
 function task_help() {
-	require "cli.task.sh"
 	require "analyse.task.sh"
 
 	local cmd_list=$( analyse_extract_commands $TASK_FILE)
@@ -27,8 +32,11 @@ function task_help() {
 	echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
 }
 
+##
+#
 function task_man() {
 	require "analyse.task.sh"
+
 	analyse_task_doc $TASK_FILE | less -R
 }
 
@@ -64,6 +72,7 @@ function task_run() {
 
 	require "${TASK_NAME}.task.sh" || return 1
 
+	# TODO: remove this line and add it to task file whch require it
 	require "cli.task.sh"
 
 	if command_function &> /dev/null
