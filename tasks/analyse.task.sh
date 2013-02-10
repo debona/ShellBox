@@ -70,23 +70,19 @@ function analyse_function_raw_doc() {
 
 ## Extracts commands from a task file
 #
-# @stdin	[file_content]	the file to analyse
-# @param	file_or_name	the task file to analyse, or its name if the file is piped in
+# @param	file	the task file to analyse
 function analyse_extract_commands() {
-	local file_content
-	local task_name
+	local task_name="$(basename "$1" .task.sh)"
 
-	if [[ -t 0 ]]
+	local reg="^(task_)|(${task_name}_)"
+	local declared_func
+	if [[ -n "$BASH" ]]
 	then
-		file_content=$( cat "$1" )
-		task_name="$(basename "$1" .task.sh)"
+		declared_func=$( typeset -F | sed 's/declare -f //g' )
 	else
-		file_content=$( cat )
-		task_name="$1"
+		declared_func=$( functions | grep ' \(\) {' | sed 's/ \(\) \{//g' )
 	fi
-
-	local regex="^(function$SPACE+)?${task_name}_([^\( 	]+)$SPACE*\(.*$"
-	echo "$file_content" | egrep "$regex" | sed -E "s:$regex:\2:g"
+	echo "$declared_func" | egrep "$reg" | sed -E "s/$reg//g"
 }
 
 
