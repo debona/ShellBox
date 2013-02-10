@@ -20,28 +20,6 @@ initializeANSI
 [[ -t 1 ]] && [[ -t 2 ]] || dropANSI
 
 
-# TODO: move these common commands in a separate task file
-
-##
-#
-function task_help() {
-	require "analyse.task.sh"
-
-	local cmd_list=$( analyse_extract_commands $TASK_FILE)
-	echo "Available commands for this task:"
-	echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
-}
-
-##
-#
-function task_man() {
-	require "analyse.task.sh"
-
-	analyse_task_doc $TASK_FILE | less -R
-}
-
-
-
 ## Print the command function for the given task
 # return 1 if the command does not exist.
 #
@@ -53,7 +31,7 @@ function command_function() {
 		return
 	fi
 
-	cmd_function="task_${CMD_NAME}"
+	cmd_function="sharedtask_${CMD_NAME}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
@@ -70,6 +48,7 @@ function task_run() {
 	CMD_NAME="$2"
 	shift 2
 
+	require "sharedtask.task.sh"
 	require "${TASK_NAME}.task.sh" || return 1
 
 	# TODO: remove this line and add it to task file whch require it
@@ -83,7 +62,9 @@ function task_run() {
 		require "cli.task.sh"
 		cli_failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
-		task_help
+		CMD_NAME="help"
+		local cmd_function=$( command_function )
+		$cmd_function
 	fi
 }
 
