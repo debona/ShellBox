@@ -50,7 +50,7 @@ function shortcut() {
 		return 1
 	fi
 
-	ln -s "shelltask" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
+	ln -s "$SHELLTASK_ROOT/main.sh" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
 
 	if [[ -x "$SHELLTASK_ROOT/path/$task_name" ]]
 	then
@@ -100,7 +100,7 @@ do
 	if ! [[ "$task_name" = 'shelltask' ]]
 	then
 		eval "function shelltask_$task_name() {
-			task_run $task_name \"\$@\"
+			run_task_command $task_name \"\$@\"
 		}"
 	fi
 done
