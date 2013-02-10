@@ -90,29 +90,36 @@ function require() {
 # @param	file	The file to source
 function locate_taskfile() {
 	local task_filename="$1"
-
-	# TODO: Create a private function which return all reachable task files
-	local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
-	local fullpath=$( find $task_dirs -type f -name "$task_filename" | tail -1 )
+	local fullpath=$( list_taskfiles | egrep "$task_filename$" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
 }
 
+##
+#
+function list_taskfiles() {
+	local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
+	local fullpaths=$( find $task_dirs -type f -name '*.task.sh' )
+	# TODO: filter the fullpaths to remove task collision
+	echo "$fullpaths"
+}
 
 
 ## Print the command function for the given task
 # return 1 if the command does not exist.
 #
-function command_function() {
-	local cmd_function="${TASK_NAME}_${CMD_NAME}"
+function _command_function() {
+	local task_name="$1"
+	local cmd_name="$2"
+	local cmd_function="${task_name}_${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
 		return
 	fi
 
-	cmd_function="sharedtask_${CMD_NAME}"
+	cmd_function="sharedtask_${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
@@ -135,17 +142,17 @@ function run_task_command() {
 	# TODO: remove this line and add it to task file whch require it
 	require "cli.task.sh"
 
-	if command_function &> /dev/null
+	if _command_function "$TASK_NAME" "$CMD_NAME" &> /dev/null
 	then
-		local cmd_function=$( command_function )
+		local cmd_function=$( _command_function "$TASK_NAME" "$CMD_NAME" )
 		$cmd_function "$@"
 	else
 		require "cli.task.sh"
 		cli_failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
-		CMD_NAME="help"
-		local cmd_function=$( command_function )
+		local cmd_function=$( _command_function "$TASK_NAME" "help" )
 		$cmd_function
+		return 1
 	fi
 }
 

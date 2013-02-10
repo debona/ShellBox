@@ -27,8 +27,7 @@ function shelltask_status() {
 function shelltask_tasks() {
 	require "analyse.task.sh"
 
-	local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
-	for task_file in `find $task_dirs -type f -name '*.task.sh'`
+	for task_file in `list_taskfiles`
 	do
 		local task_name=$( basename "$task_file" ".task.sh" )
 		local short=$( cat "$task_file" | analyse_file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
@@ -71,8 +70,7 @@ function shelltask_shortcut() {
 
 	if [[ "$task" = "all" ]]
 	then
-		local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
-		for task_file in `find $task_dirs -type f -name '*.task.sh'`
+		for task_file in `list_taskfiles`
 		do
 			shortcut `basename $task_file ".task.sh"`
 		done
@@ -93,8 +91,7 @@ echo
 }
 
 
-local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
-for task_file in `find $task_dirs -type f -name '*.task.sh'`
+for task_file in `list_taskfiles`
 do
 	local task_name=$( basename "$task_file" ".task.sh" )
 	if ! [[ "$task_name" = 'shelltask' ]]
