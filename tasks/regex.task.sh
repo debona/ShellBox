@@ -19,6 +19,20 @@
 # TODO : Add a 'which system?' switch mechanism
 
 
+## Define the global if not defined
+#
+# @param the name of the global
+# @param the value
+function global_default() {
+	global=$(printenv | egrep "^$1=")
+	if [[ "$global" = "" ]]
+	then
+		export "$1=$2"
+	fi
+}
+
+
+
 global_default SOL "▶"
 global_default EOL "◀"
 

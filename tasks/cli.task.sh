@@ -50,3 +50,21 @@ function cli_step() {
 }
 
 
+## Print command before run it
+# Allow to do: 'verbose command option && verbose something else'
+#
+#* all parameters are interpreted as command and its options
+function verbose() {
+	step "$@"
+
+	# exec the line
+	if "$@"
+	then
+		success "$@"
+		return 0
+	else
+		status=$? # remember the exit status
+		failure "$@"
+		return $status
+	fi
+}
