@@ -99,7 +99,7 @@ function locate_taskfile() {
 ##
 #
 function list_taskfiles() {
-	local task_dirs=$( echo $SHELLTASK_DIRS | tr -s ':' ' ' )
+	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
 	local fullpaths=$( find $task_dirs -type f -name '*.task.sh' )
 	# TODO: filter the fullpaths to remove task collision
 	echo "$fullpaths"
