@@ -67,13 +67,13 @@ function dropANSI() {
 
 
 ## Try to source a file across all directories present in SHELLTASK_DIRS.
-# This mechanism rely on the `locate_taskfile`.
+# This mechanism rely on the `locate_task_file`.
 # Return 1 if the file can't be sourced
 #
 # @param	file	The file to source
 function require() {
 	local file="$1"
-	local fullpath=$( locate_taskfile $file )
+	local fullpath=$( locate_task_file $file )
 
 	if ! source "$fullpath"
 	then
@@ -88,9 +88,10 @@ function require() {
 # Return 1 if the file can't be found
 #
 # @param	file	The file to source
-function locate_taskfile() {
+function locate_task_file() {
 	local task_filename="$1"
-	local fullpath=$( list_taskfiles | egrep "$task_filename$" | tail -1 )
+	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
+	local fullpath=$( find $task_dirs -type f -name '*.task.sh' | egrep "$task_filename$" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
@@ -98,11 +99,9 @@ function locate_taskfile() {
 
 ##
 #
-function list_taskfiles() {
+function list_task_names() {
 	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
-	local fullpaths=$( find $task_dirs -type f -name '*.task.sh' )
-	# TODO: filter the fullpaths to remove task collision
-	echo "$fullpaths"
+	find $task_dirs -type f -name '*.task.sh' | xargs basename -as '.task.sh' | sort -u
 }
 
 
@@ -132,7 +131,7 @@ function _command_function() {
 function run_task_command() {
 	# All this vars are reachable by the task functions
 	TASK_NAME=$( basename "$1" ".task.sh" )
-	TASK_FILE=$( locate_taskfile ${TASK_NAME}.task.sh )
+	TASK_FILE=$( locate_task_file ${TASK_NAME}.task.sh )
 	CMD_NAME="$2"
 	shift 2
 

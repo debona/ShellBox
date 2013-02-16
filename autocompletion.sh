@@ -10,7 +10,7 @@ function _complete() {
 	local task_name="${COMP_WORDS[0]}" # first word of the line
 	local current="${COMP_WORDS[COMP_CWORD]}" # the word currently auto-completed
 
-	local task_file=$( locate_taskfile "$task_name.task.sh" )
+	local task_file=$( locate_task_file "$task_name.task.sh" )
 
 	if [ "$COMP_CWORD" -eq 1 ] # the first parameter is the command
 	then
