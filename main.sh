@@ -1,10 +1,16 @@
 #!/bin/bash
 #
 # Task executer
-# PARAMETERS
-#  $1 => the task file to load
-# [$2 => the task command to call]
-# [$+ => task sub-command options]
+# This script execute task commands of a given task. It is the only script which can be execute.
+# The task name is given by $0, so you must create a symlink with the name of the task which target this script.
+#
+# @param	command		The task command to run
+# @params	options		All the task command options
+
+
+####################################################################
+###########                 GLOBAL VARS                  ###########
+####################################################################
 
 # TODO: follow the link and get the absolute path
 SHELLTASK_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
@@ -13,18 +19,14 @@ SHELLTASK_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 [[ -z $SHELLTASK_DIRS ]] && SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
 
 
-# Part of [MSGShellUtils](github.com/MattiSG/MSGShellUtils)
+####################################################################
+###########               GLOBAL FUNCTIONS               ###########
+####################################################################
+
+## Define colors.
 # From http://www.intuitive.com/wicked/showscript.cgi?011-colors.sh
 # Author: Dave Taylor
-# ANSI Color -- use these variables to easily have different color
-#    and format output. Make sure to output the reset sequence after 
-#    colors (f = foreground, b = background), and use the 'off'
-#    feature for anything you turn on.
-#
-# Example:
-#	echo "$redf Error!$reset"
-#	echo "$greenf$boldon Finished!$reset"
-function initializeANSI()
+function enableColors()
 {
 	esc=""
 
@@ -44,9 +46,9 @@ function initializeANSI()
 	reset="${esc}[0m";
 }
 
-## Drop ANSI colors to write readable log files.
+## Undefine colors to write readable log files.
 #
-function dropANSI() {
+function disableColors() {
 	unset esc
 
 	unset blackf;		unset redf;		unset greenf;
@@ -66,11 +68,11 @@ function dropANSI() {
 }
 
 
-## Try to source a file across all directories present in SHELLTASK_DIRS.
-# This mechanism rely on the `locate_task_file`.
+## Source the task file.
+# This mechanism rely on the `locate_task_file` function.
 # Return 1 if the file can't be sourced
 #
-# @param	file	The file to source
+# @param	file	The file to source but not the path (i.e. awesome_task.task.sh)
 function require() {
 	local file="$1"
 	local fullpath=$( locate_task_file $file )
@@ -85,9 +87,9 @@ function require() {
 
 ## Find a task file across all directories present in SHELLTASK_DIRS.
 # It print the path of the last task file which match.
-# Return 1 if the file can't be found
+# Return 1 if the file can't be found in SHELLTASK_DIRS
 #
-# @param	file	The file to source
+# @param	file	The file to locate but not the path (i.e. awesome_task.task.sh)
 function locate_task_file() {
 	local task_filename="$1"
 	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
@@ -97,7 +99,7 @@ function locate_task_file() {
 	[[ -z "$fullpath" ]] && return 1
 }
 
-##
+## List all task name which are available in SHELLTASK_DIRS
 #
 function list_task_names() {
 	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
@@ -105,12 +107,19 @@ function list_task_names() {
 }
 
 
-## Print the command function for the given task
-# return 1 if the command does not exist.
+####################################################################
+###########               PRIVATE FUNCTIONS              ###########
+####################################################################
+
+## Print the command function for the given task and command.
+# Return 1 if the command does not exist.
 #
+# @param	task_name	the task name
+# @param	cmd_name	the command
 function _command_function() {
 	local task_name="$1"
 	local cmd_name="$2"
+
 	local cmd_function="${task_name}_${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
@@ -128,9 +137,16 @@ function _command_function() {
 	return 1
 }
 
+
+## Run a task command with options.
+# This is the main function of shelltask.
+#
+# @param	TASK_NAME	the task name
+# @param	CMD_NAME	the command name
+# @params	options		the options
 function run_task_command() {
-	# All this vars are reachable by the task functions
-	TASK_NAME=$( basename "$1" ".task.sh" )
+	# All this vars are reachable by the tasks
+	TASK_NAME="$1"
 	TASK_FILE=$( locate_task_file ${TASK_NAME}.task.sh )
 	CMD_NAME="$2"
 	shift 2
@@ -143,12 +159,16 @@ function run_task_command() {
 
 	if _command_function "$TASK_NAME" "$CMD_NAME" &> /dev/null
 	then
+		# The task command exists
 		local cmd_function=$( _command_function "$TASK_NAME" "$CMD_NAME" )
 		$cmd_function "$@"
 	else
+		# The task command does not exist
+		# Display the error
 		require "cli.task.sh"
 		cli_failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
+		# Run the help command on the task
 		local cmd_function=$( _command_function "$TASK_NAME" "help" )
 		$cmd_function
 		return 1
@@ -156,8 +176,11 @@ function run_task_command() {
 }
 
 
-# Disable color in shell if the outputs are not tty
-initializeANSI
-[[ -t 1 ]] && [[ -t 2 ]] || dropANSI
+####################################################################
+###########              EXEC TASK COMMAND               ###########
+####################################################################
 
-run_task_command "$0" "$@"
+enableColors
+[[ -t 1 ]] && [[ -t 2 ]] || disableColors # Disable color in shell if the outputs are not tty
+
+run_task_command `basename "$0" ".task.sh"` "$@"
