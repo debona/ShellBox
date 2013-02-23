@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# The main task file
-# This task file deals with your shelltask install.
+# Provides commands that deals with your shelltask install.
+# This is the main task as it provides you information about your shelltask install and all your task.
 
 
 TODOS_REGEX=".*TODO[ 	:]+(.*)"
