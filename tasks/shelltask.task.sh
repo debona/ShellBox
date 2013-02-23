@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Provides commands that deals with your shelltask install.
+# Shelltask commands
 # This is the main task as it provides you information about your shelltask install and all your task.
 
 
@@ -51,6 +51,7 @@ function shelltask_tasks() {
 
 	for task_name in `list_task_names`
 	do
+		local task_file=$( locate_task_file "${task_name}.task.sh" )
 		local short=$( cat "$task_file" | analyse_file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
 		echo " - ${purplef}${boldon}$task_name${reset} - $short"
 	done

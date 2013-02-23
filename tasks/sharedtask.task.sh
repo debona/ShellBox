@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Provides commands shared with all tasks
+# Shared commands with all tasks
 # When you execute a task command, if the command is not found in the task, then the command is execute with this task (sharedtask).
 # That means sharedtask is always required before to execute your task commands.
 
