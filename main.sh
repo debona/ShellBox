@@ -101,7 +101,7 @@ function locate_task_file() {
 #
 function list_task_names() {
 	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
-	find $task_dirs -type f -name '*.task.sh' | xargs basename -as '.task.sh' | sort -u
+	find $task_dirs -type f -name '*.task.sh' -exec basename {} '.task.sh' \; | sort -u
 }
 
 
