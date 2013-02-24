@@ -147,7 +147,8 @@ function run_task_command() {
 	TASK_NAME="$1"
 	TASK_FILE=$( locate_task_file ${TASK_NAME}.task.sh )
 	CMD_NAME="$2"
-	shift 2
+	shift # can't run `shift 2` because if there is only one arg, it fails
+	shift
 
 	require "sharedtask.task.sh"
 	require "${TASK_NAME}.task.sh" || return 1
