@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Shellbox commands
-# This is the main task as it provides you information about your shellbox install and all your task.
+# This is the main library as it provides you information about your shellbox install and all your library.
 
 
 TODOS_REGEX=".*TODO[ 	:]+(.*)"
@@ -11,13 +11,13 @@ TODOS_REGEX=".*TODO[ 	:]+(.*)"
 ###########                  COMMANDS                    ###########
 ####################################################################
 
-## List all TODOs of the ShellTask project
+## List all TODOs of the ShellBox project
 #
 function shellbox::todos() {
 	echo "${bluef}${boldon}==================== Root: ====================${reset}"
 	extract_todos $SHELLBOX_ROOT/*.sh
 
-	echo "${bluef}${boldon}==================== Tasks: ====================${reset}"
+	echo "${bluef}${boldon}================== Libraries: ==================${reset}"
 	for path in `echo "$SHELLBOX_DIRS" | tr ':' '\n'`
 	do
 		extract_todos $path/*.sh
@@ -39,49 +39,49 @@ function shellbox::() {
 function shellbox::status() {
 	echo "Not yet implemented."
 	# TODO shellbox is it in the path
-	# TODO info about task dirs
-	# TODO list of all task shortcuted
+	# TODO info about library dirs
+	# TODO list of all library shortcuted
 }
 
 
-## Print the list of all the tasks available.
+## Print the list of all the libraries available.
 #
-function shellbox::tasks() {
+function shellbox::libraries() {
 	require "analyse.task.sh"
 
-	for task_name in `list_task_names`
+	for lib_name in `list_library_names`
 	do
-		local task_file=$( locate_task_file "${task_name}.task.sh" )
-		local short=$( cat "$task_file" | analyse::file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
-		echo " - ${purplef}${boldon}$task_name${reset} - $short"
+		local lib_file=$( locate_library_file "${lib_name}.task.sh" )
+		local short=$( cat "$lib_file" | analyse::file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
+		echo " - ${purplef}${boldon}$lib_name${reset} - $short"
 	done
 }
 
 
-## Create a shortcut for the given tasks
-# A shortcut allow you to run directly a task without prefix it with `shellbox my_task ...`
-# It simply create a symlink in the `path` folder which target the `main.sh` task executer.
+## Create a shortcut for the given libraries
+# A shortcut allow you to run directly a library without prefix it with `shellbox my_library ...`
+# It simply create a symlink in the `path` folder which target the `main.sh` library executer.
 #
-# @param	task_name	The name of the task to shortcut. 'all' create a shortcut for all available tasks.
+# @param	lib_name	The name of the library to shortcut. 'all' create a shortcut for all available libraries.
 function shellbox::shortcut() {
-	local task="$1"
+	local library="$1"
 
-	if [[ "$task" = "all" ]]
+	if [[ "$library" = "all" ]]
 	then
-		for task_name in `list_task_names`
+		for lib_name in `list_library_names`
 		do
-			shortcut $task_name
+			shortcut $lib_name
 		done
 	else
-		for task_name in $@
+		for lib_name in $@
 		do
-			shortcut $task_name
+			shortcut $lib_name
 		done
 	fi
 }
 
 
-## Delete a shortcut for the given tasks
+## Delete a shortcut for the given libraries
 # Not yet implemented.
 #
 function shellbox::unshortcut() {
@@ -89,13 +89,13 @@ function shellbox::unshortcut() {
 }
 
 
-# This hack allow shellbox to get all tasks as shellbox commands
-for task_name in `list_task_names`
+# This hack allow shellbox to get all libraries as shellbox commands
+for lib_name in `list_library_names`
 do
-	if ! [[ "$task_name" = 'shellbox' ]]
+	if ! [[ "$lib_name" = 'shellbox' ]]
 	then
-		eval "function shellbox::$task_name() {
-			run_task_command $task_name \"\$@\"
+		eval "function shellbox::$lib_name() {
+			run_library_command $lib_name \"\$@\"
 		}"
 	fi
 done
@@ -126,26 +126,26 @@ function extract_todos() {
 }
 
 
-## Create a shortcut for the given task.
+## Create a shortcut for the given library.
 #
-# @param	task_name	The name of the task to shortcut.
+# @param	lib_name	The name of the library to shortcut.
 function shortcut() {
 	require 'cli.task.sh'
 
-	local task_name="$1"
-	local task_file=$( locate_task_file "$task_name.task.sh" )
+	local lib_name="$1"
+	local lib_file=$( locate_library_file "$lib_name.task.sh" )
 
-	if ! [[ -r "$task_file" ]]
+	if ! [[ -r "$lib_file" ]]
 	then
 		echo "${redb}${boldon} ✗ could not read $1:${reset}"
 		return 1
 	fi
 
-	ln -s "../main.sh" "$SHELLBOX_ROOT/path/$task_name" &> /dev/null
+	ln -s "../main.sh" "$SHELLBOX_ROOT/path/$lib_name" &> /dev/null
 
-	if [[ -x "$SHELLBOX_ROOT/path/$task_name" ]]
+	if [[ -x "$SHELLBOX_ROOT/path/$lib_name" ]]
 	then
-		cli::step "${boldon}${bluef}$task_name${reset} available"
+		cli::step "${boldon}${bluef}$lib_name${reset} available"
 		return 0
 	else
 		cli::failure "couldn't shortcut $1${reset}"

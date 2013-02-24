@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Tasks analysis
-# The main purpose of this task file is to provide needed functions to build up the tasks documentation.
-# It source the regex task file.
+# libraries analysis
+# The main purpose of this library file is to provide needed functions to build up the libraries documentation.
+# It source the regex library file.
 
 # TODO : Allow bold in documentation
 
@@ -68,13 +68,13 @@ function analyse::function_raw_doc() {
 }
 
 
-## Extracts commands from a task file
+## Extracts commands from a library file
 #
-# @param	file	the task file to analyse
+# @param	file	the library file to analyse
 function analyse::extract_commands() {
-	local task_name="$(basename "$1" .task.sh)"
+	local lib_name="$(basename "$1" .task.sh)"
 
-	local reg="^(sharedtask::)|(${task_name}::)"
+	local reg="^(shared::)|(${lib_name}::)"
 	local declared_func
 	if [[ -n "$BASH" ]]
 	then
@@ -125,31 +125,31 @@ function analyse::function_synopsis() {
 }
 
 
-## Generate the task command documentation
+## Generate the library command documentation
 #
 # @stdin	[file_content]	the file to analyse
-# @param	file_or_name	the task file to analyse, or its name if the file is piped in
+# @param	file_or_name	the library file to analyse, or its name if the file is piped in
 # @param	cmd_name		the command name
 function analyse::command_doc() {
 	local file_content
-	local task_name
+	local lib_name
 
 	if [[ -t 0 ]]
 	then
 		file_content=$( cat "$1" )
-		task_name="$(basename "$1" .task.sh)"
+		lib_name="$(basename "$1" .task.sh)"
 	else
 		file_content=$( cat )
-		task_name="$1"
+		lib_name="$1"
 	fi
 
 	local cmd_name="$2"
-	local function_name="${task_name}::${cmd_name}"
+	local function_name="${lib_name}::${cmd_name}"
 
 	local raw_doc=$( echo "$file_content" | analyse::function_raw_doc "$function_name")
 	local raw_inputs_doc=$(echo "$raw_doc" | analyse::function_raw_input)
 
-	echo "$raw_inputs_doc" | analyse::function_synopsis "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
+	echo "$raw_inputs_doc" | analyse::function_synopsis "${boldon}${purplef}$lib_name ${bluef}$cmd_name${reset}"
 
 	echo "$raw_doc" \
 		| egrep -v "$input_regex" \
@@ -187,25 +187,25 @@ function analyse::file_doc() {
 }
 
 
-## Generate the task file documentation
+## Generate the library file documentation
 #
-# @param	task_file	the task file
-function analyse::task_doc() {
-	local task_file="$1"
-	local task_name=$(basename $task_file .task.sh)
+# @param	lib_file	the library file
+function analyse::library_doc() {
+	local lib_file="$1"
+	local lib_name=$(basename $lib_file .task.sh)
 
-	local file_content=$( cat "$task_file" )
+	local file_content=$( cat "$lib_file" )
 
 	local description=$(echo "$file_content" \
 		| analyse::file_raw_doc \
 		| sed -E "s/^#[# 	]*(.*)$/\1/g")
 	local short=$(echo "$description" | head -n 1)
 
-	local commands=$(analyse::extract_commands $task_file)
+	local commands=$(analyse::extract_commands $lib_file)
 
 	echo
 	echo "${boldon}NAME${reset}"
-	echo "${purplef}${boldon}$task_name${reset} - $short" | format "${tab}"
+	echo "${purplef}${boldon}$lib_name${reset} - $short" | format "${tab}"
 
 	echo
 	echo "${boldon}SYNOPSIS${reset}"
@@ -213,9 +213,9 @@ function analyse::task_doc() {
 	for _command in $commands
 	do
 		echo "$file_content" \
-			| analyse::function_raw_doc "${task_name}_${_command}" \
+			| analyse::function_raw_doc "${lib_name}_${_command}" \
 			| analyse::function_raw_input \
-			| analyse::function_synopsis "${boldon}${purplef}$task_name ${bluef}${_command}${reset}" \
+			| analyse::function_synopsis "${boldon}${purplef}$lib_name ${bluef}${_command}${reset}" \
 			| format "${tab}"
 	done
 
@@ -228,7 +228,7 @@ function analyse::task_doc() {
 	# TODO : default command
 	for _command in $commands
 	do
-		echo "$file_content" | analyse::command_doc "$task_name" "${_command}" | format "${tab}"
+		echo "$file_content" | analyse::command_doc "$lib_name" "${_command}" | format "${tab}"
 		echo
 	done
 }

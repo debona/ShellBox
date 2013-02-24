@@ -33,25 +33,25 @@ Usage
 
 ### Standalone
 
-Shelltask allow to use directly task file. This is a straightforward but pretty verbose usage.
+Shellbox allow to use directly library file. This is a straightforward but pretty verbose usage.
 
-	shelltask/full/path/shelltask.sh	path/to/taks/my_task.task.sh
-	shelltask/full/path/shelltask.sh	path/to/taks/my_task.task.sh	command_1
+	shellbox/full/path/shellbox.sh	path/to/taks/my_library.task.sh
+	shellbox/full/path/shellbox.sh	path/to/taks/my_library.task.sh	command_1
 
 
 ### Automagic
 
-If you are a magic enthusiast, you would appreciate to use shelltask this way:
+If you are a magic enthusiast, you would appreciate to use shellbox this way:
 
-	source	shelltask/full/path/source_me.sh	path/to/taks
+	source	shellbox/full/path/source_me.sh	path/to/taks
 
-Now, enjoy `my_task`
+Now, enjoy `my_library`
 
-	my_task
-	my_task	command_1
+	my_library
+	my_library	command_1
 
-The `source_me.sh` script creates the aliases for shelltask emmbeded tasks and all tasks in `path/to/taks`.
-It also add awesome task commands completion to your shell environment. So `my_task	c` will be complete by `my_task	command_1`.
+The `source_me.sh` script creates the aliases for shellbox emmbeded librarys and all librarys in `path/to/taks`.
+It also add awesome library commands completion to your shell environment. So `my_library	c` will be complete by `my_library	command_1`.
 
 
 ### More details

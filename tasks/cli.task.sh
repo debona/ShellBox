@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # UI shell script library
-# This task allows to print on stderr and stdout with differents color schemes.
+# This library allows to print on stderr and stdout with differents color schemes.
 
 ## Print the message with the given color
 #

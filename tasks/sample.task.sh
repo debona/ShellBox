@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# A complete task file sample.
+# A complete library file sample.
 # This file is sourced by shellbox each time.
-# Shelltask declare the following globals:
+# ShellBox declare the following globals:
 # - SHELLBOX_ROOT: Root directory
-# - SHELLBOX_DIRS: Tasks directory
-# - TASK_FILE: Loaded task file (i.e. path/to/sample.task.sh)
-# - TASK_NAME: Loaded task name (i.e. sample)
-# - CMD_NAME: Invoked task command
+# - SHELLBOX_DIRS: librarys directory
+# - LIB_FILE: Loaded library file (i.e. path/to/sample.task.sh)
+# - LIB_NAME: Loaded library name (i.e. sample)
+# - CMD_NAME: Invoked library command
 
 require "cli.task.sh"
 
@@ -59,12 +59,12 @@ function sample::multiline() {
 ## Self-tested function
 # This is a self tested function to assert that analysis can extract
 # Note that this command does not respect any code convention
-# Test to extract the raw documentation of task command
+# Test to extract the raw documentation of library command
 
 sample::self_tested ( ){
 	require "analyse.task.sh"
 
-	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "sample::self_tested")
+	local raw_function_doc=$(cat "$LIB_FILE" | analyse_function_raw_doc "sample::self_tested")
 
 	local first_line=$(echo "$raw_function_doc" | head -n 1)
 	local last_line=$(echo "$raw_function_doc" | tail -n 1)
@@ -75,7 +75,7 @@ sample::self_tested ( ){
 		return 1
 	fi
 
-	if [[ "$last_line" != "# Test to extract the raw documentation of task command" ]]
+	if [[ "$last_line" != "# Test to extract the raw documentation of library command" ]]
 	then
 		cli::failure "Last documentation line not found"
 		return 1

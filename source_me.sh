@@ -31,7 +31,7 @@ do
 done
 export SHELLBOX_DIRS=$SHELLBOX_DIRS
 
-# Create shortcut for all tasks?
+# Create shortcut for all library?
 shellbox shortcut all
 
 # TODO: enabled autocompletion shellbox shortcut all

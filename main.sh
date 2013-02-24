@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Task executer
-# This script execute task commands of a given task. It is the only script which can be execute.
-# The task name is given by $0, so you must create a symlink with the name of the task which target this script.
+# Library command executer
+# This script execute library commands of a given library. It is the only script which can be execute.
+# The library name is given by $0, so you must create a symlink with the name of the library which target this script.
 #
-# @param	command		The task command to run
-# @params	options		All the task command options
+# @param	command		The library command to run
+# @params	options		All the library command options
 
 
 ####################################################################
@@ -66,14 +66,14 @@ function disableColors() {
 }
 
 
-## Source the task file.
-# This mechanism rely on the `locate_task_file` function.
+## Source the library file.
+# This mechanism rely on the `locate_library_file` function.
 # Return 1 if the file can't be sourced
 #
-# @param	file	The file to source but not the path (i.e. awesome_task.task.sh)
+# @param	file	The file to source but not the path (i.e. awesome_library.task.sh)
 function require() {
 	local file="$1"
-	local fullpath=$( locate_task_file $file )
+	local fullpath=$( locate_library_file $file )
 
 	if ! source "$fullpath"
 	then
@@ -83,25 +83,25 @@ function require() {
 	fi
 }
 
-## Find a task file across all directories present in SHELLBOX_DIRS.
-# It print the path of the last task file which match.
+## Find a library file across all directories present in SHELLBOX_DIRS.
+# It print the path of the last library file which match.
 # Return 1 if the file can't be found in SHELLBOX_DIRS
 #
-# @param	file	The file to locate but not the path (i.e. awesome_task.task.sh)
-function locate_task_file() {
-	local task_filename="$1"
-	local task_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
-	local fullpath=$( find $task_dirs -type f -name '*.task.sh' | egrep "$task_filename$" | tail -1 )
+# @param	file	The file to locate but not the path (i.e. awesome_library.task.sh)
+function locate_library_file() {
+	local library_filename="$1"
+	local library_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
+	local fullpath=$( find $library_dirs -type f -name '*.task.sh' | egrep "$library_filename$" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
 }
 
-## List all task name which are available in SHELLBOX_DIRS
+## List all library name which are available in SHELLBOX_DIRS
 #
-function list_task_names() {
-	local task_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
-	find $task_dirs -type f -name '*.task.sh' -exec basename {} '.task.sh' \; | sort -u
+function list_library_names() {
+	local library_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
+	find $library_dirs -type f -name '*.task.sh' -exec basename {} '.task.sh' \; | sort -u
 }
 
 
@@ -109,23 +109,23 @@ function list_task_names() {
 ###########               PRIVATE FUNCTIONS              ###########
 ####################################################################
 
-## Print the command function for the given task and command.
+## Print the command function for the given library and command.
 # Return 1 if the command does not exist.
 #
-# @param	task_name	the task name
+# @param	library_name	the library name
 # @param	cmd_name	the command
 function _command_function() {
-	local task_name="$1"
+	local library_name="$1"
 	local cmd_name="$2"
 
-	local cmd_function="${task_name}::${cmd_name}"
+	local cmd_function="${library_name}::${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
 		return
 	fi
 
-	cmd_function="sharedtask::${cmd_name}"
+	cmd_function="shared::${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
@@ -136,36 +136,36 @@ function _command_function() {
 }
 
 
-## Run a task command with options.
+## Run a library command with options.
 # This is the main function of shellbox.
 #
-# @param	TASK_NAME	the task name
+# @param	LIB_NAME	the library name
 # @param	CMD_NAME	the command name
 # @params	options		the options
-function run_task_command() {
-	# All this vars are reachable by the tasks
-	TASK_NAME="$1"
-	TASK_FILE=$( locate_task_file ${TASK_NAME}.task.sh )
+function run_library_command() {
+	# All this vars are reachable by the librarys
+	LIB_NAME="$1"
+	LIB_FILE=$( locate_library_file ${LIB_NAME}.task.sh )
 	CMD_NAME="$2"
 	shift # can't run `shift 2` because if there is only one arg, it fails
 	shift
 
-	require "sharedtask.task.sh"
-	require "${TASK_NAME}.task.sh" || return 1
+	require "shared.task.sh"
+	require "${LIB_NAME}.task.sh" || return 1
 
-	if _command_function "$TASK_NAME" "$CMD_NAME" &> /dev/null
+	if _command_function "$LIB_NAME" "$CMD_NAME" &> /dev/null
 	then
-		# The task command exists
-		local cmd_function=$( _command_function "$TASK_NAME" "$CMD_NAME" )
+		# The library command exists
+		local cmd_function=$( _command_function "$LIB_NAME" "$CMD_NAME" )
 		$cmd_function "$@"
 	else
-		# The task command does not exist
+		# The library command does not exist
 		# Display the error
 		require "cli.task.sh"
 		cli::failure "This command does not exist:"
-		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
-		# Run the help command on the task
-		local cmd_function=$( _command_function "$TASK_NAME" "help" )
+		echo "	- ${boldon}${purplef}$LIB_NAME ${redf}$CMD_NAME${reset}"
+		# Run the help command on the library
+		local cmd_function=$( _command_function "$LIB_NAME" "help" )
 		$cmd_function
 		return 1
 	fi
@@ -173,10 +173,10 @@ function run_task_command() {
 
 
 ####################################################################
-###########              EXEC TASK COMMAND               ###########
+###########               EXEC LIB COMMAND               ###########
 ####################################################################
 
 enableColors
 [[ -t 1 ]] && [[ -t 2 ]] || disableColors # Disable color in shell if the outputs are not tty
 
-run_task_command `basename "$0" ".task.sh"` "$@"
+run_library_command `basename "$0" ".task.sh"` "$@"
