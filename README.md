@@ -1,10 +1,10 @@
 
-ShellTask
+ShellBox
 =========
 
-**ShellTask is a straightforward framework** which help to organize the **shellscript** development.
+**ShellBox is a straightforward framework** which help to organize the **shellscript** development.
 
-### ShellTask's goals
+### ShellBox's goals
 
 - Lightly standardize shellscript development
 - Build a library of small reusable shellscript

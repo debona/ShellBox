@@ -1,38 +1,38 @@
 #!/bin/bash
 #
 #
-# All parameters are added to SHELLTASK_DIRS
+# All parameters are added to SHELLBOX_DIRS
 
 # Compatibility:
 #	bash (sourced and subshell)
 #	zsh  (sourced and subshell)
 if [[ -n "$BASH" ]]
 then
-	SHELLTASK_ROOT="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+	SHELLBOX_ROOT="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 else
-	SHELLTASK_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
+	SHELLBOX_ROOT="$( cd -P "$( dirname "$0" )" && pwd )"
 fi
 
-# Put shelltask in path if needed
-if ! [[ ":$PATH:" =~ ":$SHELLTASK_ROOT/path:" ]]
+# Put shellbox in path if needed
+if ! [[ ":$PATH:" =~ ":$SHELLBOX_ROOT/path:" ]]
 then
-	export PATH="$PATH:$SHELLTASK_ROOT/path"
+	export PATH="$PATH:$SHELLBOX_ROOT/path"
 fi
 
-# Put all parameters in SHELLTASK_DIRS
-SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
+# Put all parameters in SHELLBOX_DIRS
+SHELLBOX_DIRS="$SHELLBOX_ROOT/tasks"
 for directory in "$@"
 do
 	directory="$( cd -P "$directory" && pwd )"
 	if [[ -d "$directory" ]]
 	then
-		SHELLTASK_DIRS="$SHELLTASK_DIRS:$directory"
+		SHELLBOX_DIRS="$SHELLBOX_DIRS:$directory"
 	fi
 done
-export SHELLTASK_DIRS=$SHELLTASK_DIRS
+export SHELLBOX_DIRS=$SHELLBOX_DIRS
 
 # Create shortcut for all tasks?
-shelltask shortcut all
+shellbox shortcut all
 
-# TODO: enabled autocompletion shelltask shortcut all
-source "$SHELLTASK_ROOT/autocompletion.sh"
+# TODO: enabled autocompletion shellbox shortcut all
+source "$SHELLBOX_ROOT/autocompletion.sh"

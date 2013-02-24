@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Shelltask commands
-# This is the main task as it provides you information about your shelltask install and all your task.
+# Shellbox commands
+# This is the main task as it provides you information about your shellbox install and all your task.
 
 
 TODOS_REGEX=".*TODO[ 	:]+(.*)"
@@ -13,12 +13,12 @@ TODOS_REGEX=".*TODO[ 	:]+(.*)"
 
 ## List all TODOs of the ShellTask project
 #
-function shelltask::todos() {
+function shellbox::todos() {
 	echo "${bluef}${boldon}==================== Root: ====================${reset}"
-	extract_todos $SHELLTASK_ROOT/*.sh
+	extract_todos $SHELLBOX_ROOT/*.sh
 
 	echo "${bluef}${boldon}==================== Tasks: ====================${reset}"
-	for path in `echo "$SHELLTASK_DIRS" | tr ':' '\n'`
+	for path in `echo "$SHELLBOX_DIRS" | tr ':' '\n'`
 	do
 		extract_todos $path/*.sh
 	done
@@ -28,17 +28,17 @@ function shelltask::todos() {
 ## The default command.
 # Run the `status` command with no options.
 #
-function shelltask::() {
-	shelltask::status
+function shellbox::() {
+	shellbox::status
 }
 
 
-## Print the status of your shelltask install
+## Print the status of your shellbox install
 # Not yet implemented
 #
-function shelltask::status() {
+function shellbox::status() {
 	echo "Not yet implemented."
-	# TODO shelltask is it in the path
+	# TODO shellbox is it in the path
 	# TODO info about task dirs
 	# TODO list of all task shortcuted
 }
@@ -46,7 +46,7 @@ function shelltask::status() {
 
 ## Print the list of all the tasks available.
 #
-function shelltask::tasks() {
+function shellbox::tasks() {
 	require "analyse.task.sh"
 
 	for task_name in `list_task_names`
@@ -59,11 +59,11 @@ function shelltask::tasks() {
 
 
 ## Create a shortcut for the given tasks
-# A shortcut allow you to run directly a task without prefix it with `shelltask my_task ...`
+# A shortcut allow you to run directly a task without prefix it with `shellbox my_task ...`
 # It simply create a symlink in the `path` folder which target the `main.sh` task executer.
 #
 # @param	task_name	The name of the task to shortcut. 'all' create a shortcut for all available tasks.
-function shelltask::shortcut() {
+function shellbox::shortcut() {
 	local task="$1"
 
 	if [[ "$task" = "all" ]]
@@ -84,17 +84,17 @@ function shelltask::shortcut() {
 ## Delete a shortcut for the given tasks
 # Not yet implemented.
 #
-function shelltask::unshortcut() {
+function shellbox::unshortcut() {
 	echo "Not yet implemented."
 }
 
 
-# This hack allow shelltask to get all tasks as shelltask commands
+# This hack allow shellbox to get all tasks as shellbox commands
 for task_name in `list_task_names`
 do
-	if ! [[ "$task_name" = 'shelltask' ]]
+	if ! [[ "$task_name" = 'shellbox' ]]
 	then
-		eval "function shelltask::$task_name() {
+		eval "function shellbox::$task_name() {
 			run_task_command $task_name \"\$@\"
 		}"
 	fi
@@ -141,9 +141,9 @@ function shortcut() {
 		return 1
 	fi
 
-	ln -s "../main.sh" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
+	ln -s "../main.sh" "$SHELLBOX_ROOT/path/$task_name" &> /dev/null
 
-	if [[ -x "$SHELLTASK_ROOT/path/$task_name" ]]
+	if [[ -x "$SHELLBOX_ROOT/path/$task_name" ]]
 	then
 		cli::step "${boldon}${bluef}$task_name${reset} available"
 		return 0

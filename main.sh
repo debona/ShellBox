@@ -12,9 +12,9 @@
 ###########                 GLOBAL VARS                  ###########
 ####################################################################
 
-SHELLTASK_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
+SHELLBOX_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 
-[[ ":$SHELLTASK_DIRS:" =~ ":$SHELLTASK_ROOT/tasks:" ]] || SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks:$SHELLTASK_DIRS"
+[[ ":$SHELLBOX_DIRS:" =~ ":$SHELLBOX_ROOT/tasks:" ]] || SHELLBOX_DIRS="$SHELLBOX_ROOT/tasks:$SHELLBOX_DIRS"
 
 
 ####################################################################
@@ -78,29 +78,29 @@ function require() {
 	if ! source "$fullpath"
 	then
 		echo "$file cannot be sourced from path:"
-		echo "SHELLTASK_DIRS=$SHELLTASK_DIRS"
+		echo "SHELLBOX_DIRS=$SHELLBOX_DIRS"
 		return 1
 	fi
 }
 
-## Find a task file across all directories present in SHELLTASK_DIRS.
+## Find a task file across all directories present in SHELLBOX_DIRS.
 # It print the path of the last task file which match.
-# Return 1 if the file can't be found in SHELLTASK_DIRS
+# Return 1 if the file can't be found in SHELLBOX_DIRS
 #
 # @param	file	The file to locate but not the path (i.e. awesome_task.task.sh)
 function locate_task_file() {
 	local task_filename="$1"
-	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
+	local task_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
 	local fullpath=$( find $task_dirs -type f -name '*.task.sh' | egrep "$task_filename$" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
 }
 
-## List all task name which are available in SHELLTASK_DIRS
+## List all task name which are available in SHELLBOX_DIRS
 #
 function list_task_names() {
-	local task_dirs=$( echo $SHELLTASK_DIRS | tr ':' ' ' )
+	local task_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
 	find $task_dirs -type f -name '*.task.sh' -exec basename {} '.task.sh' \; | sort -u
 }
 
@@ -137,7 +137,7 @@ function _command_function() {
 
 
 ## Run a task command with options.
-# This is the main function of shelltask.
+# This is the main function of shellbox.
 #
 # @param	TASK_NAME	the task name
 # @param	CMD_NAME	the command name
