@@ -9,6 +9,8 @@
 # - TASK_NAME: Loaded task name (i.e. sample)
 # - CMD_NAME: Invoked task command
 
+require "cli.task.sh"
+
 ## Default command
 # Default command cannot have parameters!
 function sample_() {

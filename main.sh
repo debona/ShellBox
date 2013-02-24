@@ -12,11 +12,9 @@
 ###########                 GLOBAL VARS                  ###########
 ####################################################################
 
-# TODO: follow the link and get the absolute path
 SHELLTASK_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 
-# TODO: Ensure that SHELLTASK_DIRS includes $SHELLTASK_ROOT/tasks
-[[ -z $SHELLTASK_DIRS ]] && SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks"
+[[ ":$SHELLTASK_DIRS:" =~ ":$SHELLTASK_ROOT/tasks:" ]] || SHELLTASK_DIRS="$SHELLTASK_ROOT/tasks:$SHELLTASK_DIRS"
 
 
 ####################################################################
@@ -153,9 +151,6 @@ function run_task_command() {
 
 	require "sharedtask.task.sh"
 	require "${TASK_NAME}.task.sh" || return 1
-
-	# TODO: remove this line and add it to task file whch require it
-	require "cli.task.sh"
 
 	if _command_function "$TASK_NAME" "$CMD_NAME" &> /dev/null
 	then
