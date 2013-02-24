@@ -130,6 +130,8 @@ function extract_todos() {
 #
 # @param	task_name	The name of the task to shortcut.
 function shortcut() {
+	require 'cli.task.sh'
+
 	local task_name="$1"
 	local task_file=$( locate_task_file "$task_name.task.sh" )
 
@@ -139,14 +141,14 @@ function shortcut() {
 		return 1
 	fi
 
-	ln -s "$SHELLTASK_ROOT/main.sh" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
+	ln -s "../main.sh" "$SHELLTASK_ROOT/path/$task_name" &> /dev/null
 
 	if [[ -x "$SHELLTASK_ROOT/path/$task_name" ]]
 	then
-		echo "${boldon} ● ${bluef}$task_name${reset} available"
+		cli::step "${boldon}${bluef}$task_name${reset} available"
 		return 0
 	else
-		echo "${redb}${boldon} ✗ couldn't import $1:${reset}"
+		cli::failure "couldn't shortcut $1${reset}"
 		return 1
 	fi
 }
