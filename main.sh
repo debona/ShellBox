@@ -118,14 +118,14 @@ function _command_function() {
 	local task_name="$1"
 	local cmd_name="$2"
 
-	local cmd_function="${task_name}_${cmd_name}"
+	local cmd_function="${task_name}::${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
 		return
 	fi
 
-	cmd_function="sharedtask_${cmd_name}"
+	cmd_function="sharedtask::${cmd_name}"
 	if type $cmd_function &> /dev/null
 	then
 		echo $cmd_function
@@ -161,7 +161,7 @@ function run_task_command() {
 		# The task command does not exist
 		# Display the error
 		require "cli.task.sh"
-		cli_failure "This command does not exist:"
+		cli::failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$TASK_NAME ${redf}$CMD_NAME${reset}"
 		# Run the help command on the task
 		local cmd_function=$( _command_function "$TASK_NAME" "help" )

@@ -13,13 +13,13 @@ require "cli.task.sh"
 
 ## Default command
 # Default command cannot have parameters!
-function sample_() {
+function sample::() {
 	if [[ -z $1 ]]
 	then
-		cli_success "There are no parameters"
+		cli::success "There are no parameters"
 		return 0
 	else
-		cli_failure "There is at least one parameter: $@"
+		cli::failure "There is at least one parameter: $@"
 		return 1
 	fi
 }
@@ -28,28 +28,28 @@ function sample_() {
 #
 # @param	{echo "herp"}	args	arguments to display
 # @params	{echo "derp"}	arg		another arg
-function sample_oneline () {
-	cli_step "Print all parameters in one line:"
+function sample::oneline () {
+	cli::step "Print all parameters in one line:"
 	if [[ -z $1 ]]
 	then
-		cli_warning "There is no parameters"
+		cli::warning "There is no parameters"
 	else
-		cli_success "$@"
+		cli::success "$@"
 	fi
 }
 
 ## Print one parameter by line
 #
 # @params	args	arguments to display
-function sample_multiline() {
-	cli_step "Print one parameter by line"
+function sample::multiline() {
+	cli::step "Print one parameter by line"
 	if [[ -z $1 ]]
 	then
-		cli_warning "There is no parameters"
+		cli::warning "There is no parameters"
 	else
 		for i in `seq 1 $#`
 		do
-			cli_success "$i => '$1'"
+			cli::success "$i => '$1'"
 			shift
 		done
 	fi
@@ -61,25 +61,25 @@ function sample_multiline() {
 # Note that this command does not respect any code convention
 # Test to extract the raw documentation of task command
 
-sample_self_tested ( ){
+sample::self_tested ( ){
 	require "analyse.task.sh"
 
-	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "sample_self_tested")
+	local raw_function_doc=$(cat "$TASK_FILE" | analyse_function_raw_doc "sample::self_tested")
 
 	local first_line=$(echo "$raw_function_doc" | head -n 1)
 	local last_line=$(echo "$raw_function_doc" | tail -n 1)
 
 	if [[ "$first_line" != "## Self-tested function" ]]
 	then
-		cli_failure "First documentation line not found"
+		cli::failure "First documentation line not found"
 		return 1
 	fi
 
 	if [[ "$last_line" != "# Test to extract the raw documentation of task command" ]]
 	then
-		cli_failure "Last documentation line not found"
+		cli::failure "Last documentation line not found"
 		return 1
 	fi
 
-	cli_success "Documentation found"
+	cli::success "Documentation found"
 }

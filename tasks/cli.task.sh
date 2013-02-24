@@ -19,7 +19,7 @@ function echolor() {
 #
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
-function cli_success() {
+function cli::success() {
 	echolor "${greenf} ✔ " "$@"
 }
 
@@ -27,7 +27,7 @@ function cli_success() {
 #
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
-function cli_failure() {
+function cli::failure() {
 	echolor "${redf} ✘ " "$@" >&2
 }
 
@@ -36,7 +36,7 @@ function cli_failure() {
 #
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
-function cli_warning() {
+function cli::warning() {
 	echolor "${yellowf} ⚑ " "$@" >&2
 }
 
@@ -45,7 +45,7 @@ function cli_warning() {
 #
 # @param	emphased	is emphased
 # @params	others		is printed with default settings
-function cli_step() {
+function cli::step() {
 	echolor "${cyanf} ● " "$@"
 }
 

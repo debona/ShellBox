@@ -51,7 +51,7 @@ global_default BL "$SOL$SPACE*$EOL"
 # @param [input_file] the file to read
 # @param regex the regex to match
 # @param [group=0] the group to print
-function regex_match() {
+function regex::match() {
 	local file_content
 
 	if [[ -t 0 ]]

@@ -13,7 +13,7 @@ TODOS_REGEX=".*TODO[ 	:]+(.*)"
 
 ## List all TODOs of the ShellTask project
 #
-function shelltask_todos() {
+function shelltask::todos() {
 	echo "${bluef}${boldon}==================== Root: ====================${reset}"
 	extract_todos $SHELLTASK_ROOT/*.sh
 
@@ -28,15 +28,15 @@ function shelltask_todos() {
 ## The default command.
 # Run the `status` command with no options.
 #
-function shelltask_() {
-	shelltask_status
+function shelltask::() {
+	shelltask::status
 }
 
 
 ## Print the status of your shelltask install
 # Not yet implemented
 #
-function shelltask_status() {
+function shelltask::status() {
 	echo "Not yet implemented."
 	# TODO shelltask is it in the path
 	# TODO info about task dirs
@@ -46,13 +46,13 @@ function shelltask_status() {
 
 ## Print the list of all the tasks available.
 #
-function shelltask_tasks() {
+function shelltask::tasks() {
 	require "analyse.task.sh"
 
 	for task_name in `list_task_names`
 	do
 		local task_file=$( locate_task_file "${task_name}.task.sh" )
-		local short=$( cat "$task_file" | analyse_file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
+		local short=$( cat "$task_file" | analyse::file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
 		echo " - ${purplef}${boldon}$task_name${reset} - $short"
 	done
 }
@@ -63,7 +63,7 @@ function shelltask_tasks() {
 # It simply create a symlink in the `path` folder which target the `main.sh` task executer.
 #
 # @param	task_name	The name of the task to shortcut. 'all' create a shortcut for all available tasks.
-function shelltask_shortcut() {
+function shelltask::shortcut() {
 	local task="$1"
 
 	if [[ "$task" = "all" ]]
@@ -84,16 +84,17 @@ function shelltask_shortcut() {
 ## Delete a shortcut for the given tasks
 # Not yet implemented.
 #
-function shelltask_unshortcut() {
+function shelltask::unshortcut() {
 	echo "Not yet implemented."
 }
+
 
 # This hack allow shelltask to get all tasks as shelltask commands
 for task_name in `list_task_names`
 do
 	if ! [[ "$task_name" = 'shelltask' ]]
 	then
-		eval "function shelltask_$task_name() {
+		eval "function shelltask::$task_name() {
 			run_task_command $task_name \"\$@\"
 		}"
 	fi
@@ -109,7 +110,6 @@ done
 # @stdin	[file_content]	the content of the file to parse
 # @params	[file_list]		The list of the files to analyse
 function extract_todos() {
-
 	if ! [[ -t 0 ]]
 	then # if stdin is NOT a tty
 		cat | egrep "$TODOS_REGEX" | sed -E "s/$TODOS_REGEX/\1/g"

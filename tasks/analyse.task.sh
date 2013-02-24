@@ -46,11 +46,11 @@ function format() {
 #
 # @stdin	[file_content]	[the content file to analyse]
 # @param	[file]			the file to analyse
-function analyse_file_raw_doc() {
+function analyse::file_raw_doc() {
 	local file_content
 	[[ -t 0 ]] && file_content=$(cat $1) || file_content=$( cat )
 
-	echo "$file_content" | regex_match "${bin_bash_line}*(${comment_line}+)$BL" 3
+	echo "$file_content" | regex::match "${bin_bash_line}*(${comment_line}+)$BL" 3
 }
 
 
@@ -59,22 +59,22 @@ function analyse_file_raw_doc() {
 #
 # @stdin	file_content	the file to analyse
 # @param	function_name	the function name
-function analyse_function_raw_doc() {
+function analyse::function_raw_doc() {
 	local function_name="$1"
 	local file_content
 	[[ -t 0 ]] || file_content=$( cat )
 
-	echo "$file_content" | regex_match "(${special_comment_line}${comment_line}*)($BL)*$SOL$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
+	echo "$file_content" | regex::match "(${special_comment_line}${comment_line}*)($BL)*$SOL$SPACE*(function$SPACE)?$SPACE*${function_name}$SPACE*\(" 1
 }
 
 
 ## Extracts commands from a task file
 #
 # @param	file	the task file to analyse
-function analyse_extract_commands() {
+function analyse::extract_commands() {
 	local task_name="$(basename "$1" .task.sh)"
 
-	local reg="^(task_)|(${task_name}_)"
+	local reg="^(sharedtask::)|(${task_name}::)"
 	local declared_func
 	if [[ -n "$BASH" ]]
 	then
@@ -92,7 +92,7 @@ function analyse_extract_commands() {
 # ● @param(s)?  {completion_function}  the_name  The description
 #
 # @stdin	command_raw_doc	the function raw documentation
-function analyse_function_raw_input() {
+function analyse::function_raw_input() {
 	local command_raw_doc
 	[[ -t 0 ]] || command_raw_doc=$( cat )
 
@@ -106,7 +106,7 @@ function analyse_function_raw_input() {
 #
 # @stdin	function_raw_input	the raw function parameters
 # @param	function_name		the function name to display
-function analyse_function_synopsis() {
+function analyse::function_synopsis() {
 	local function_raw_input
 	[[ -t 0 ]] || function_raw_input=$( cat )
 	local function_name="$1"
@@ -130,7 +130,7 @@ function analyse_function_synopsis() {
 # @stdin	[file_content]	the file to analyse
 # @param	file_or_name	the task file to analyse, or its name if the file is piped in
 # @param	cmd_name		the command name
-function analyse_command_doc() {
+function analyse::command_doc() {
 	local file_content
 	local task_name
 
@@ -144,12 +144,12 @@ function analyse_command_doc() {
 	fi
 
 	local cmd_name="$2"
-	local function_name="${task_name}_${cmd_name}"
+	local function_name="${task_name}::${cmd_name}"
 
-	local raw_doc=$( echo "$file_content" | analyse_function_raw_doc "$function_name")
-	local raw_inputs_doc=$(echo "$raw_doc" | analyse_function_raw_input)
+	local raw_doc=$( echo "$file_content" | analyse::function_raw_doc "$function_name")
+	local raw_inputs_doc=$(echo "$raw_doc" | analyse::function_raw_input)
 
-	echo "$raw_inputs_doc" | analyse_function_synopsis "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
+	echo "$raw_inputs_doc" | analyse::function_synopsis "${boldon}${purplef}$task_name ${bluef}$cmd_name${reset}"
 
 	echo "$raw_doc" \
 		| egrep -v "$input_regex" \
@@ -168,11 +168,11 @@ function analyse_command_doc() {
 ## Generate the file documentation
 #
 # @param	file	the file
-function analyse_file_doc() {
+function analyse::file_doc() {
 	local file="$1"
 	local file_name=$(basename $file)
 
-	local description=$(analyse_file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/\1/g")
+	local description=$(analyse::file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/\1/g")
 	local short=$(echo "$description" | head -n 1)
 
 	echo "FILE"
@@ -190,18 +190,18 @@ function analyse_file_doc() {
 ## Generate the task file documentation
 #
 # @param	task_file	the task file
-function analyse_task_doc() {
+function analyse::task_doc() {
 	local task_file="$1"
 	local task_name=$(basename $task_file .task.sh)
 
 	local file_content=$( cat "$task_file" )
 
 	local description=$(echo "$file_content" \
-		| analyse_file_raw_doc \
+		| analyse::file_raw_doc \
 		| sed -E "s/^#[# 	]*(.*)$/\1/g")
 	local short=$(echo "$description" | head -n 1)
 
-	local commands=$(analyse_extract_commands $task_file)
+	local commands=$(analyse::extract_commands $task_file)
 
 	echo
 	echo "${boldon}NAME${reset}"
@@ -213,9 +213,9 @@ function analyse_task_doc() {
 	for _command in $commands
 	do
 		echo "$file_content" \
-			| analyse_function_raw_doc "${task_name}_${_command}" \
-			| analyse_function_raw_input \
-			| analyse_function_synopsis "${boldon}${purplef}$task_name ${bluef}${_command}${reset}" \
+			| analyse::function_raw_doc "${task_name}_${_command}" \
+			| analyse::function_raw_input \
+			| analyse::function_synopsis "${boldon}${purplef}$task_name ${bluef}${_command}${reset}" \
 			| format "${tab}"
 	done
 
@@ -228,7 +228,7 @@ function analyse_task_doc() {
 	# TODO : default command
 	for _command in $commands
 	do
-		echo "$file_content" | analyse_command_doc "$task_name" "${_command}" | format "${tab}"
+		echo "$file_content" | analyse::command_doc "$task_name" "${_command}" | format "${tab}"
 		echo
 	done
 }

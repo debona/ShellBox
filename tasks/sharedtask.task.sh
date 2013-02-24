@@ -7,12 +7,12 @@
 
 ## Display a short help of the task. i.e. list of available commands
 #
-function sharedtask_help() {
+function sharedtask::help() {
 	# TODO should take command as $1
 	# TODO should take task as $1 and command as $2
 	require "analyse.task.sh"
 
-	local cmd_list=$( analyse_extract_commands $TASK_FILE)
+	local cmd_list=$( analyse::extract_commands $TASK_FILE)
 	echo "Available commands for this task:"
 	echo "$cmd_list" | sed -E "s:(.*):	- ${boldon}${purplef}$TASK_NAME ${bluef}\1${reset}:g"
 }
@@ -20,10 +20,10 @@ function sharedtask_help() {
 
 ## Display a detailed manual of the task.
 #
-function sharedtask_man() {
+function sharedtask::man() {
 	# TODO should take command as $1
 	# TODO should take task as $1 and command as $2
 	require "analyse.task.sh"
 
-	analyse_task_doc "$TASK_FILE" | less -R
+	analyse::task_doc "$TASK_FILE" | less -R
 }
