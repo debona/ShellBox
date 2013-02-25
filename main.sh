@@ -14,7 +14,7 @@
 
 SHELLBOX_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 
-[[ ":$SHELLBOX_DIRS:" =~ ":$SHELLBOX_ROOT/tasks:" ]] || SHELLBOX_DIRS="$SHELLBOX_ROOT/tasks:$SHELLBOX_DIRS"
+[[ ":$SHELLBOXES:" =~ ":$SHELLBOX_ROOT/box:" ]] || SHELLBOXES="$SHELLBOX_ROOT/box:$SHELLBOXES"
 
 
 ####################################################################
@@ -78,29 +78,29 @@ function require() {
 	if ! source "$fullpath"
 	then
 		echo "$file cannot be sourced from path:"
-		echo "SHELLBOX_DIRS=$SHELLBOX_DIRS"
+		echo "SHELLBOXES=$SHELLBOXES"
 		return 1
 	fi
 }
 
-## Find a library file across all directories present in SHELLBOX_DIRS.
+## Find a library file across all directories present in SHELLBOXES.
 # It print the path of the last library file which match.
-# Return 1 if the file can't be found in SHELLBOX_DIRS
+# Return 1 if the file can't be found in SHELLBOXES
 #
 # @param	file	The file to locate but not the path (i.e. awesome_library.lib.sh)
 function locate_library_file() {
 	local library_filename="$1"
-	local library_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
+	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
 	local fullpath=$( find $library_dirs -type f -name '*.lib.sh' | egrep "$library_filename$" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
 }
 
-## List all library name which are available in SHELLBOX_DIRS
+## List all library name which are available in SHELLBOXES
 #
 function list_library_names() {
-	local library_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
+	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
 	find $library_dirs -type f -name '*.lib.sh' -exec basename {} '.lib.sh' \; | sort -u
 }
 

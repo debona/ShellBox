@@ -18,7 +18,7 @@ function shellbox::todos() {
 	extract_todos $SHELLBOX_ROOT/*.sh
 
 	echo "${bluef}${boldon}================== Libraries: ==================${reset}"
-	for path in `echo "$SHELLBOX_DIRS" | tr ':' '\n'`
+	for path in `echo "$SHELLBOXES" | tr ':' '\n'`
 	do
 		extract_todos $path/*.sh
 	done
