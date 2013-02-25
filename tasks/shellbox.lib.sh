@@ -47,11 +47,11 @@ function shellbox::status() {
 ## Print the list of all the libraries available.
 #
 function shellbox::libraries() {
-	require "analyse.task.sh"
+	require "analyse.lib.sh"
 
 	for lib_name in `list_library_names`
 	do
-		local lib_file=$( locate_library_file "${lib_name}.task.sh" )
+		local lib_file=$( locate_library_file "${lib_name}.lib.sh" )
 		local short=$( cat "$lib_file" | analyse::file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
 		echo " - ${purplef}${boldon}$lib_name${reset} - $short"
 	done
@@ -130,10 +130,10 @@ function extract_todos() {
 #
 # @param	lib_name	The name of the library to shortcut.
 function shortcut() {
-	require 'cli.task.sh'
+	require 'cli.lib.sh'
 
 	local lib_name="$1"
-	local lib_file=$( locate_library_file "$lib_name.task.sh" )
+	local lib_file=$( locate_library_file "$lib_name.lib.sh" )
 
 	if ! [[ -r "$lib_file" ]]
 	then

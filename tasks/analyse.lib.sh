@@ -6,7 +6,7 @@
 
 # TODO : Allow bold in documentation
 
-require "regex.task.sh"
+require "regex.lib.sh"
 
 # common patterns used for analysis:
 
@@ -72,7 +72,7 @@ function analyse::function_raw_doc() {
 #
 # @param	file	the library file to analyse
 function analyse::extract_commands() {
-	local lib_name="$(basename "$1" .task.sh)"
+	local lib_name="$(basename "$1" .lib.sh)"
 
 	local reg="^(shared::)|(${lib_name}::)"
 	local declared_func
@@ -137,7 +137,7 @@ function analyse::command_doc() {
 	if [[ -t 0 ]]
 	then
 		file_content=$( cat "$1" )
-		lib_name="$(basename "$1" .task.sh)"
+		lib_name="$(basename "$1" .lib.sh)"
 	else
 		file_content=$( cat )
 		lib_name="$1"
@@ -192,7 +192,7 @@ function analyse::file_doc() {
 # @param	lib_file	the library file
 function analyse::library_doc() {
 	local lib_file="$1"
-	local lib_name=$(basename $lib_file .task.sh)
+	local lib_name=$(basename $lib_file .lib.sh)
 
 	local file_content=$( cat "$lib_file" )
 

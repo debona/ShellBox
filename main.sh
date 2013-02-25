@@ -70,7 +70,7 @@ function disableColors() {
 # This mechanism rely on the `locate_library_file` function.
 # Return 1 if the file can't be sourced
 #
-# @param	file	The file to source but not the path (i.e. awesome_library.task.sh)
+# @param	file	The file to source but not the path (i.e. awesome_library.lib.sh)
 function require() {
 	local file="$1"
 	local fullpath=$( locate_library_file $file )
@@ -87,11 +87,11 @@ function require() {
 # It print the path of the last library file which match.
 # Return 1 if the file can't be found in SHELLBOX_DIRS
 #
-# @param	file	The file to locate but not the path (i.e. awesome_library.task.sh)
+# @param	file	The file to locate but not the path (i.e. awesome_library.lib.sh)
 function locate_library_file() {
 	local library_filename="$1"
 	local library_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
-	local fullpath=$( find $library_dirs -type f -name '*.task.sh' | egrep "$library_filename$" | tail -1 )
+	local fullpath=$( find $library_dirs -type f -name '*.lib.sh' | egrep "$library_filename$" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
@@ -101,7 +101,7 @@ function locate_library_file() {
 #
 function list_library_names() {
 	local library_dirs=$( echo $SHELLBOX_DIRS | tr ':' ' ' )
-	find $library_dirs -type f -name '*.task.sh' -exec basename {} '.task.sh' \; | sort -u
+	find $library_dirs -type f -name '*.lib.sh' -exec basename {} '.lib.sh' \; | sort -u
 }
 
 
@@ -145,13 +145,13 @@ function _command_function() {
 function run_library_command() {
 	# All this vars are reachable by the librarys
 	LIB_NAME="$1"
-	LIB_FILE=$( locate_library_file ${LIB_NAME}.task.sh )
+	LIB_FILE=$( locate_library_file ${LIB_NAME}.lib.sh )
 	CMD_NAME="$2"
 	shift # can't run `shift 2` because if there is only one arg, it fails
 	shift
 
-	require "shared.task.sh"
-	require "${LIB_NAME}.task.sh" || return 1
+	require "shared.lib.sh"
+	require "${LIB_NAME}.lib.sh" || return 1
 
 	if _command_function "$LIB_NAME" "$CMD_NAME" &> /dev/null
 	then
@@ -161,7 +161,7 @@ function run_library_command() {
 	else
 		# The library command does not exist
 		# Display the error
-		require "cli.task.sh"
+		require "cli.lib.sh"
 		cli::failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$LIB_NAME ${redf}$CMD_NAME${reset}"
 		# Run the help command on the library
@@ -179,4 +179,4 @@ function run_library_command() {
 enableColors
 [[ -t 1 ]] && [[ -t 2 ]] || disableColors # Disable color in shell if the outputs are not tty
 
-run_library_command `basename "$0" ".task.sh"` "$@"
+run_library_command `basename "$0" ".lib.sh"` "$@"

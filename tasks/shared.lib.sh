@@ -10,7 +10,7 @@
 function shared::help() {
 	# TODO should take command as $1
 	# TODO should take library as $1 and command as $2
-	require "analyse.task.sh"
+	require "analyse.lib.sh"
 
 	local cmd_list=$( analyse::extract_commands $LIB_FILE)
 	echo "Available commands for this library:"
@@ -23,7 +23,7 @@ function shared::help() {
 function shared::man() {
 	# TODO should take command as $1
 	# TODO should take library as $1 and command as $2
-	require "analyse.task.sh"
+	require "analyse.lib.sh"
 
 	analyse::library_doc "$LIB_FILE" | less -R
 }

@@ -10,7 +10,7 @@ function _complete() {
 	local lib_name="${COMP_WORDS[0]}" # first word of the line
 	local current="${COMP_WORDS[COMP_CWORD]}" # the word currently auto-completed
 
-	local lib_file=$( locate_library_file "$lib_name.task.sh" )
+	local lib_file=$( locate_library_file "$lib_name.lib.sh" )
 
 	if [ "$COMP_CWORD" -eq 1 ] # the first parameter is the command
 	then
@@ -37,7 +37,7 @@ function _complete() {
 function complete_commands() {
 	local lib_file="$1"
 	local file_content=$( cat "$lib_file" )
-	local lib_name=$( basename "$lib_file" '.task.sh' )
+	local lib_name=$( basename "$lib_file" '.lib.sh' )
 
 	local regex="^(function[ 	]+)?${lib_name}_([^\( 	]+)[ 	]*\(.*$"
 
@@ -50,11 +50,11 @@ function complete_commands() {
 # @param	cmd_name	the command name
 # @param	n			the "index" of the parameter
 function complete_option() {
-	require "analyse.task.sh" # this source is inside the function to avoid the analyse functions leak
+	require "analyse.lib.sh" # this source is inside the function to avoid the analyse functions leak
 
 	local lib_file="$1"
 	local file_content=$( cat "$lib_file" )
-	local lib_name=$( basename "$lib_file" '.task.sh' )
+	local lib_name=$( basename "$lib_file" '.lib.sh' )
 	local cmd_name="$2"
 	local n="$3"
 

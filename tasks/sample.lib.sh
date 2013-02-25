@@ -5,11 +5,11 @@
 # ShellBox declare the following globals:
 # - SHELLBOX_ROOT: Root directory
 # - SHELLBOX_DIRS: librarys directory
-# - LIB_FILE: Loaded library file (i.e. path/to/sample.task.sh)
+# - LIB_FILE: Loaded library file (i.e. path/to/sample.lib.sh)
 # - LIB_NAME: Loaded library name (i.e. sample)
 # - CMD_NAME: Invoked library command
 
-require "cli.task.sh"
+require "cli.lib.sh"
 
 ## Default command
 # Default command cannot have parameters!
@@ -62,7 +62,7 @@ function sample::multiline() {
 # Test to extract the raw documentation of library command
 
 sample::self_tested ( ){
-	require "analyse.task.sh"
+	require "analyse.lib.sh"
 
 	local raw_function_doc=$(cat "$LIB_FILE" | analyse_function_raw_doc "sample::self_tested")
 
