@@ -15,9 +15,6 @@
 # The whitespace: $SPACE ("[ 	]" by default)
 # The blank line: $BL ("$SOL$SPACE*$EOL" by default)
 
-# TODO : create another lib for environments
-# TODO : Add a 'which system?' switch mechanism
-
 
 ## Define the global if not defined
 #

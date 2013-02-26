@@ -4,7 +4,6 @@
 # The main purpose of this library file is to provide needed functions to build up the libraries documentation.
 # It source the regex library file.
 
-# TODO : Allow bold in documentation
 
 require "regex.lib.sh"
 
@@ -213,7 +212,7 @@ function analyse::library_doc() {
 	for _command in $commands
 	do
 		echo "$file_content" \
-			| analyse::function_raw_doc "${lib_name}_${_command}" \
+			| analyse::function_raw_doc "${lib_name}::${_command}" \
 			| analyse::function_raw_input \
 			| analyse::function_synopsis "${boldon}${purplef}$lib_name ${bluef}${_command}${reset}" \
 			| format "${tab}"
