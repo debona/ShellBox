@@ -71,15 +71,16 @@ function analyse::function_raw_doc() {
 #
 # @param	file	the library file to analyse
 function analyse::extract_commands() {
-	local lib_name="$(basename "$1" .lib.sh)"
+	local lib_name=$( basename "$1" .lib.sh )
 
 	local reg="^(shared::)|(${lib_name}::)"
 	local declared_func
 	if [[ -n "$BASH" ]]
 	then
-		declared_func=$( typeset -F | sed 's/declare -f //g' )
+		declared_func=$( require `basename "$1"` && typeset -F | sed 's/declare -f //g' )
+		# the require is inside the fork to avoid to leak all the functions
 	else
-		declared_func=$( functions | grep ' \(\) {' | sed 's/ \(\) \{//g' )
+		declared_func=$( require `basename "$1"` && functions | grep ' \(\) {' | sed 's/ \(\) \{//g' )
 	fi
 	echo "$declared_func" | egrep "$reg" | sed -E "s/$reg//g"
 }
