@@ -11,6 +11,14 @@ TODOS_REGEX=".*TODO[ 	:]+(.*)"
 ###########                  COMMANDS                    ###########
 ####################################################################
 
+## The default command.
+# Run the `status` command with no options.
+#
+function shellbox::() {
+	shellbox::status
+}
+
+
 ## List all TODOs of the ShellBox project
 #
 function shellbox::todos() {
@@ -25,22 +33,31 @@ function shellbox::todos() {
 }
 
 
-## The default command.
-# Run the `status` command with no options.
-#
-function shellbox::() {
-	shellbox::status
-}
-
-
 ## Print the status of your shellbox install
 # Not yet implemented
 #
 function shellbox::status() {
-	echo "Not yet implemented."
-	# TODO shellbox is it in the path
-	# TODO info about library dirs
-	# TODO list of all library shortcuted
+	require "cli.lib.sh"
+
+	if which shellbox &> /dev/null
+	then
+		cli::step "shellbox is available in your PATH"
+	else
+		cli::warning "shellbox is NOT available in your PATH"
+	fi
+
+	shellbox::libraries
+
+
+	for lib_name in `list_library_names`
+	do
+		if [[ -x "$SHELLBOX_ROOT/bin/$lib_name" ]]
+		then
+			cli::success "${purplef}${boldon}$lib_name${reset} shortcuted"
+		else
+			cli::warning "${purplef}${boldon}$lib_name${reset} NOT shortcuted"
+		fi
+	done
 }
 
 
@@ -48,12 +65,14 @@ function shellbox::status() {
 #
 function shellbox::libraries() {
 	require "analyse.lib.sh"
+	require "cli.lib.sh"
 
+	cli::step "Available libraries:"
 	for lib_name in `list_library_names`
 	do
 		local lib_file=$( locate_library_file "${lib_name}.lib.sh" )
 		local short=$( cat "$lib_file" | analyse::file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
-		echo " - ${purplef}${boldon}$lib_name${reset} - $short"
+		echo "   - ${purplef}${boldon}$lib_name${reset} - $short"
 	done
 }
 
@@ -128,7 +147,7 @@ function extract_todos() {
 
 ## Create a shortcut for the given library.
 #
-# @param	lib_name	The name of the library to shortcut.
+# @param	lib_name	The name of the library to shortcut
 function shortcut() {
 	require 'cli.lib.sh'
 
@@ -141,14 +160,14 @@ function shortcut() {
 		return 1
 	fi
 
-	ln -s "../main.sh" "$SHELLBOX_ROOT/path/$lib_name" &> /dev/null
+	ln -s "../main.sh" "$SHELLBOX_ROOT/bin/$lib_name" &> /dev/null
 
-	if [[ -x "$SHELLBOX_ROOT/path/$lib_name" ]]
+	if [[ -x "$SHELLBOX_ROOT/bin/$lib_name" ]]
 	then
 		cli::step "${boldon}${bluef}$lib_name${reset} available"
 		return 0
 	else
-		cli::failure "couldn't shortcut $1${reset}"
+		cli::failure "couldn't shortcut $lib_name${reset}"
 		return 1
 	fi
 }
