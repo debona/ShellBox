@@ -41,7 +41,7 @@ function shared_library_help() {
 
 	echo "Available commands for this library:"
 
-	for _command in $cmd_list
+	echo "$cmd_list" | while read _command # the while loop avoids to ignore blank line
 	do
 		echo -n "    "
 		echo "$file_content" \
