@@ -209,8 +209,7 @@ function analyse::library_doc() {
 
 	echo
 	echo "${boldon}SYNOPSIS${reset}"
-	# TODO : default command
-	for _command in $commands
+	echo "$commands" | while read _command # the while loop avoids to ignore blank line
 	do
 		echo "$file_content" \
 			| analyse::function_raw_doc "${lib_name}::${_command}" \
@@ -225,8 +224,7 @@ function analyse::library_doc() {
 
 	echo
 	echo "${boldon}COMMANDS${reset}"
-	# TODO : default command
-	for _command in $commands
+	echo "$commands" | while read _command
 	do
 		echo "$file_content" | analyse::command_doc "$lib_name" "${_command}" | format "${tab}"
 		echo
