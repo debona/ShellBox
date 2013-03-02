@@ -165,28 +165,6 @@ function analyse::command_doc() {
 }
 
 
-## Generate the file documentation
-#
-# @param	file	the file
-function analyse::file_doc() {
-	local file="$1"
-	local file_name=$(basename $file)
-
-	local description=$(analyse::file_raw_doc $file | sed -E "s/^#[# 	]*(.*)$/\1/g")
-	local short=$(echo "$description" | head -n 1)
-
-	echo "FILE"
-	echo "${purplef}$file_name${reset} - $short" | format "${tab}"
-	echo "DESCRIPTION"
-	echo "$description" | format "${tab}"
-
-	# TODO : Handle parameters like a command
-	#	synopsis
-	#	input output
-	#	parameters
-}
-
-
 ## Generate the library file documentation
 #
 # @param	lib_file	the library file
