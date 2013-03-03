@@ -10,6 +10,8 @@
 # - CMD_NAME: Invoked library command
 
 
+include 'shared'
+
 require 'cli'
 
 ## Default command

@@ -4,6 +4,9 @@
 # The main purpose of this library file is to provide needed functions to build up the libraries documentation.
 # It source the regex library file.
 
+
+include 'shared'
+
 require 'regex'
 
 # common patterns used for analysis:

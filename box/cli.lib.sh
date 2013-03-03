@@ -3,6 +3,9 @@
 # UI shell script library
 # This library allows to print on stderr and stdout with differents color schemes.
 
+
+include 'shared'
+
 ## Print the message with the given color
 #
 # @param	color		the color

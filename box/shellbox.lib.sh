@@ -4,6 +4,8 @@
 # This is the main library as it provides you information about your shellbox install and all your library.
 
 
+include 'shared'
+
 TODOS_REGEX=".*TODO[ 	:]+(.*)"
 
 

@@ -162,13 +162,6 @@ function _command_function() {
 		return
 	fi
 
-	cmd_function="shared::${cmd_name}"
-	if type $cmd_function &> /dev/null
-	then
-		echo $cmd_function
-		return
-	fi
-
 	return 1
 }
 
@@ -180,14 +173,13 @@ function _command_function() {
 # @param	CMD_NAME	the command name
 # @params	options		the options
 function run_library_command() {
-	# All this vars are reachable by the librarys
+	# All this vars are reachable by the libraries
 	LIB_NAME="$1" # TODO: refactor the name of these var with something like: SELF_NAME, etc
 	LIB_FILE=$( locate_library_file ${LIB_NAME} )
 	CMD_NAME="$2"
 	shift # can't run `shift 2` because if there is only one arg, it fails
 	shift
 
-	require 'shared'
 	require "${LIB_NAME}" || return 1
 
 	if _command_function "$LIB_NAME" "$CMD_NAME" &> /dev/null

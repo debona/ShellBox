@@ -16,6 +16,8 @@
 # The blank line: $BL ("$SOL$SPACE*$EOL" by default)
 
 
+include 'shared'
+
 ## Define the global if not defined
 #
 # @param the name of the global
