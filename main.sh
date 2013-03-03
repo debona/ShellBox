@@ -72,7 +72,7 @@ function disableColors() {
 #
 # @param	file	The file to source but not the path (i.e. awesome_library.lib.sh)
 function require() {
-	local file="$1"
+	local file="$1" # TODO: take the name instead of the file
 	local fullpath=$( locate_library_file $file )
 
 	if ! source "$fullpath"
@@ -83,13 +83,31 @@ function require() {
 	fi
 }
 
+## Include all the commands available in the given library
+# This mechanism rely on the `require` and the `list_library_commands` functions.
+# Return 1 if the file can't be required
+#
+# @param	lib_name	The name of the library to include
+function include() {
+	local lib_name="$1"
+	require $lib_name.lib.sh || return 1
+
+	local _commands=$( list_library_commands $lib_name )
+	for _command in $_commands
+	do
+		eval "function ${LIB_NAME}::${_command}() {
+			${lib_name}::${_command} \"\$@\"
+		}"
+	done
+}
+
 ## Find a library file across all directories present in SHELLBOXES.
 # It print the path of the last library file which match.
 # Return 1 if the file can't be found in SHELLBOXES
 #
 # @param	file	The file to locate but not the path (i.e. awesome_library.lib.sh)
 function locate_library_file() {
-	local library_filename="$1"
+	local library_filename="$1" # TODO: take the name instead the file
 	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
 	local fullpath=$( find $library_dirs -type f -name '*.lib.sh' | egrep "$library_filename$" | tail -1 )
 
@@ -104,6 +122,22 @@ function list_library_names() {
 	find $library_dirs -type f -name '*.lib.sh' -exec basename {} '.lib.sh' \; | sort -u
 }
 
+## List all commands available in the given library
+#
+# @param	lib_name	The name of the library
+function list_library_commands() {
+	local lib_name="$1"
+
+	local reg="^${lib_name}::"
+	local declared_func
+	if [[ -n "$BASH" ]]
+	then
+		declared_func=$( require "$lib_name.lib.sh" && typeset -F | sed 's/declare -f //g' ) # the require is inside the fork to avoid to leak all the functions
+	else
+		declared_func=$( require "$lib_name.lib.sh" && functions | grep ' \(\) {' | sed 's/ \(\) \{//g' )
+	fi
+	echo "$declared_func" | egrep "$reg" | sed -E "s/$reg//g"
+}
 
 ####################################################################
 ###########               PRIVATE FUNCTIONS              ###########
@@ -144,7 +178,7 @@ function _command_function() {
 # @params	options		the options
 function run_library_command() {
 	# All this vars are reachable by the librarys
-	LIB_NAME="$1"
+	LIB_NAME="$1" # TODO: refactor the name of these var with something like: SELF_NAME, etc
 	LIB_FILE=$( locate_library_file ${LIB_NAME}.lib.sh )
 	CMD_NAME="$2"
 	shift # can't run `shift 2` because if there is only one arg, it fails
