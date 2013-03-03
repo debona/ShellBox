@@ -9,7 +9,8 @@
 # - LIB_NAME: Loaded library name (i.e. sample)
 # - CMD_NAME: Invoked library command
 
-require "cli.lib.sh"
+
+require 'cli'
 
 ## Default command
 # Default command cannot have parameters!
@@ -62,7 +63,7 @@ function sample::multiline() {
 # Test to extract the raw documentation of library command
 
 sample::self_tested ( ){
-	require "analyse.lib.sh"
+	require 'analyse'
 
 	local raw_function_doc=$(cat "$LIB_FILE" | analyse_function_raw_doc "sample::self_tested")
 

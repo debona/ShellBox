@@ -10,7 +10,7 @@ function _complete() {
 	local lib_name="${COMP_WORDS[0]}" # first word of the line
 	local current="${COMP_WORDS[COMP_CWORD]}" # the word currently auto-completed
 
-	local lib_file=$( locate_library_file "$lib_name.lib.sh" )
+	local lib_file=$( locate_library_file "$lib_name" )
 
 	if [ "$COMP_CWORD" -eq 1 ] # the first parameter is the command
 	then
@@ -50,7 +50,7 @@ function complete_commands() {
 # @param	cmd_name	the command name
 # @param	n			the "index" of the parameter
 function complete_option() {
-	require "analyse.lib.sh" # this source is inside the function to avoid the analyse functions leak
+	require 'analyse' # this source is inside the function to avoid the analyse functions leak
 
 	local lib_file="$1"
 	local file_content=$( cat "$lib_file" )

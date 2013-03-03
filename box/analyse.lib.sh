@@ -4,8 +4,7 @@
 # The main purpose of this library file is to provide needed functions to build up the libraries documentation.
 # It source the regex library file.
 
-
-require "regex.lib.sh"
+require 'regex'
 
 # common patterns used for analysis:
 

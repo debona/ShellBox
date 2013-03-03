@@ -70,14 +70,14 @@ function disableColors() {
 # This mechanism rely on the `locate_library_file` function.
 # Return 1 if the file can't be sourced
 #
-# @param	file	The file to source but not the path (i.e. awesome_library.lib.sh)
+# @param	lib_name	The name of the library to source
 function require() {
-	local file="$1" # TODO: take the name instead of the file
-	local fullpath=$( locate_library_file $file )
+	local lib_name="$1"
+	local fullpath=$( locate_library_file $lib_name )
 
 	if ! source "$fullpath"
 	then
-		echo "$file cannot be sourced from path:"
+		echo "$lib_name cannot be sourced from path:"
 		echo "SHELLBOXES=$SHELLBOXES"
 		return 1
 	fi
@@ -90,7 +90,7 @@ function require() {
 # @param	lib_name	The name of the library to include
 function include() {
 	local lib_name="$1"
-	require $lib_name.lib.sh || return 1
+	require "$lib_name" || return 1
 
 	local _commands=$( list_library_commands $lib_name )
 	for _command in $_commands
@@ -105,11 +105,11 @@ function include() {
 # It print the path of the last library file which match.
 # Return 1 if the file can't be found in SHELLBOXES
 #
-# @param	file	The file to locate but not the path (i.e. awesome_library.lib.sh)
+# @param	lib_name	The name of the library to locate
 function locate_library_file() {
-	local library_filename="$1" # TODO: take the name instead the file
+	local lib_name="$1"
 	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
-	local fullpath=$( find $library_dirs -type f -name '*.lib.sh' | egrep "$library_filename$" | tail -1 )
+	local fullpath=$( find $library_dirs -type f -name "${lib_name}.lib.sh" | tail -1 )
 
 	echo "$fullpath"
 	[[ -z "$fullpath" ]] && return 1
@@ -132,9 +132,9 @@ function list_library_commands() {
 	local declared_func
 	if [[ -n "$BASH" ]]
 	then
-		declared_func=$( require "$lib_name.lib.sh" && typeset -F | sed 's/declare -f //g' ) # the require is inside the fork to avoid to leak all the functions
+		declared_func=$( require "$lib_name" && typeset -F | sed 's/declare -f //g' ) # the require is inside the fork to avoid to leak all the functions
 	else
-		declared_func=$( require "$lib_name.lib.sh" && functions | grep ' \(\) {' | sed 's/ \(\) \{//g' )
+		declared_func=$( require "$lib_name" && functions | grep ' \(\) {' | sed 's/ \(\) \{//g' )
 	fi
 	echo "$declared_func" | egrep "$reg" | sed -E "s/$reg//g"
 }
@@ -179,13 +179,13 @@ function _command_function() {
 function run_library_command() {
 	# All this vars are reachable by the librarys
 	LIB_NAME="$1" # TODO: refactor the name of these var with something like: SELF_NAME, etc
-	LIB_FILE=$( locate_library_file ${LIB_NAME}.lib.sh )
+	LIB_FILE=$( locate_library_file ${LIB_NAME} )
 	CMD_NAME="$2"
 	shift # can't run `shift 2` because if there is only one arg, it fails
 	shift
 
-	require "shared.lib.sh"
-	require "${LIB_NAME}.lib.sh" || return 1
+	require 'shared'
+	require "${LIB_NAME}" || return 1
 
 	if _command_function "$LIB_NAME" "$CMD_NAME" &> /dev/null
 	then
@@ -195,7 +195,7 @@ function run_library_command() {
 	else
 		# The library command does not exist
 		# Display the error
-		require "cli.lib.sh"
+		require 'cli'
 		cli::failure "This command does not exist:"
 		echo "	- ${boldon}${purplef}$LIB_NAME ${redf}$CMD_NAME${reset}"
 		# Run the help command on the library

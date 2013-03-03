@@ -21,7 +21,7 @@ function shared::help() {
 ## Display a detailed manual of the library.
 #
 function shared::man() {
-	require "analyse.lib.sh"
+	require 'analyse'
 
 	analyse::library_doc "$LIB_FILE" | less -R
 }
@@ -34,7 +34,7 @@ function shared::man() {
 ## Display a short help of the library. i.e. list of available commands with options
 #
 function shared_library_help() {
-	require "analyse.lib.sh"
+	require 'analyse'
 
 	local cmd_list=$( analyse::extract_commands $LIB_FILE)
 	local file_content=$( cat $LIB_FILE )
@@ -55,7 +55,7 @@ function shared_library_help() {
 #
 # @param	command_name	the library command name
 function shared_command_help() {
-	require "analyse.lib.sh"
+	require 'analyse'
 
 	local cmd_list=$( analyse::extract_commands $LIB_FILE)
 	local file_content=$( cat $LIB_FILE )

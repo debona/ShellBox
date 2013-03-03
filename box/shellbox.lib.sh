@@ -37,7 +37,7 @@ function shellbox::todos() {
 # Not yet implemented
 #
 function shellbox::status() {
-	require "cli.lib.sh"
+	require 'cli'
 
 	if which shellbox &> /dev/null
 	then
@@ -64,13 +64,13 @@ function shellbox::status() {
 ## Print the list of all the libraries available.
 #
 function shellbox::libraries() {
-	require "analyse.lib.sh"
-	require "cli.lib.sh"
+	require 'analyse'
+	require 'cli'
 
 	cli::step "Available libraries:"
 	for lib_name in `list_library_names`
 	do
-		local lib_file=$( locate_library_file "${lib_name}.lib.sh" )
+		local lib_file=$( locate_library_file "${lib_name}" )
 		local short=$( cat "$lib_file" | analyse::file_raw_doc | sed -E "s/^#[# 	]*(.*)$/\1/g" | head -n 1 )
 		echo "   - ${purplef}${boldon}$lib_name${reset} - $short"
 	done
@@ -155,10 +155,10 @@ function extract_todos() {
 #
 # @param	lib_name	The name of the library to shortcut
 function shortcut() {
-	require 'cli.lib.sh'
+	require 'cli'
 
 	local lib_name="$1"
-	local lib_file=$( locate_library_file "$lib_name.lib.sh" )
+	local lib_file=$( locate_library_file "$lib_name" )
 
 	if ! [[ -r "$lib_file" ]]
 	then
@@ -182,7 +182,7 @@ function shortcut() {
 #
 # @param	lib_name	The name of the library to unshortcut
 function unshortcut() {
-	require 'cli.lib.sh'
+	require 'cli'
 
 	local lib_name="$1"
 	local shortcut="$SHELLBOX_ROOT/bin/$lib_name"
