@@ -95,9 +95,12 @@ function include() {
 	local _commands=$( list_library_commands $lib_name )
 	for _command in $_commands
 	do
-		eval "function ${LIB_NAME}::${_command}() {
-			${lib_name}::${_command} \"\$@\"
-		}"
+		if ! type "${LIB_NAME}::${_command}" &> /dev/null
+		then
+			eval "function ${LIB_NAME}::${_command}() {
+				${lib_name}::${_command} \"\$@\"
+			}"
+		fi
 	done
 }
 
