@@ -95,7 +95,7 @@ function include() {
 	local _commands=$( list_library_commands $lib_name )
 	for _command in $_commands
 	do
-		if ! type "${LIB_NAME}::${_command}" &> /dev/null
+		if ! type "${LIB_NAME}::${_command}" &> /dev/null # Do not override the existing function
 		then
 			eval "function ${LIB_NAME}::${_command}() {
 				${lib_name}::${_command} \"\$@\"
@@ -114,8 +114,7 @@ function locate_library_file() {
 	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
 	local fullpath=$( find $library_dirs -type f -name "${lib_name}.lib.sh" | tail -1 )
 
-	echo "$fullpath"
-	[[ -z "$fullpath" ]] && return 1
+	[[ -n $fullpath ]] && echo "$fullpath" || return 1
 }
 
 ## List all library name which are available in SHELLBOXES
