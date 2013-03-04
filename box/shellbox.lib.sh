@@ -121,9 +121,7 @@ for lib_name in `list_library_names`
 do
 	if ! [[ "$lib_name" = 'shellbox' ]]
 	then
-		eval "function shellbox::$lib_name() {
-			run_library_command $lib_name \"\$@\"
-		}"
+		extend $lib_name
 	fi
 done
 
