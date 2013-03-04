@@ -7,6 +7,7 @@
 
 include 'shared'
 
+require 'cli'
 require 'regex'
 
 # common patterns used for analysis:
