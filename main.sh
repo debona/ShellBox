@@ -24,18 +24,29 @@ SHELLBOX_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 ## Source the library file.
 # This mechanism rely on the `locate_library_file` function.
 # Return 1 if the file can't be sourced
+# It defines `SELF_NAME` and `SELF_FILE` which are available in the required library.
+# The global vars `SELF_NAME` and `SELF_FILE` are no longer available in the required library.
 #
 # @param	lib_name	The name of the library to source
 function require() {
-	local lib_name="$1"
-	local fullpath=$( locate_library_file $lib_name )
+	local old_name="$SELF_NAME"
+	local old_file="$SELF_FILE"
 
-	if ! source "$fullpath"
+	SELF_NAME="$1"
+	SELF_FILE=$( locate_library_file $SELF_NAME )
+
+	local status=0
+	if ! source "$SELF_FILE"
 	then
+		status=$?
 		echo "$lib_name cannot be sourced from path:"
 		echo "SHELLBOXES=$SHELLBOXES"
-		return 1
 	fi
+
+	SELF_NAME="$old_name"
+	SELF_FILE="$old_file"
+
+	return $status
 }
 
 ## Include all the commands available in the given library
@@ -45,14 +56,15 @@ function require() {
 # @param	lib_name	The name of the library to include
 function include() {
 	local lib_name="$1"
-	require "$lib_name" || return 1
+	locate_library_file "$lib_name" &> /dev/null || return 1
 
 	local _commands=$( list_library_commands $lib_name )
 	for _command in $_commands
 	do
-		if ! type "${LIB_NAME}::${_command}" &> /dev/null # Do not override the existing function
+		if ! type "${SELF_NAME}::${_command}" &> /dev/null # Do not override the existing function
 		then
-			eval "function ${LIB_NAME}::${_command}() {
+			eval "function ${SELF_NAME}::${_command}() {
+				require $lib_name
 				${lib_name}::${_command} \"\$@\"
 			}"
 		fi
@@ -69,9 +81,9 @@ function extend() {
 	local lib_name="$1"
 	locate_library_file "$lib_name" &> /dev/null || return 1
 
-	if ! type "${LIB_NAME}::${lib_name}" &> /dev/null
+	if ! type "${SELF_NAME}::${lib_name}" &> /dev/null
 	then
-		eval "function ${LIB_NAME}::${lib_name}() {
+		eval "function ${SELF_NAME}::${lib_name}() {
 			run_library_command $lib_name \"\$@\"
 		}"
 	fi
