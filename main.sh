@@ -48,24 +48,6 @@ function require() {
 }
 
 
-## Extend all the commands available in the given library through a subcommand.
-# This mechanism rely on the `run_library_command` function.
-# Return 1 if the library can't be found.
-#
-# @param	lib_name	The name of the library to include
-function extend() {
-	local lib_name="$1"
-	locate_library_file "$lib_name" &> /dev/null || return 1
-
-	if ! type "${SELF_NAME}::${lib_name}" &> /dev/null
-	then
-		eval "function ${SELF_NAME}::${lib_name}() {
-			run_library_command $lib_name \"\$@\"
-		}"
-	fi
-}
-
-
 ## Find a library file across all directories present in SHELLBOXES.
 # It print the path of the last library file which match.
 # Return 1 if the file can't be found in SHELLBOXES

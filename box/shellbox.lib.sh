@@ -136,9 +136,11 @@ function shellbox::unshortcut() {
 # This hack allow shellbox to get all libraries as shellbox commands
 for lib_name in `list_library_names`
 do
-	if ! [[ "$lib_name" = 'shellbox' ]]
+	if ! [[ "$lib_name" = 'shellbox' ]] || type "shellbox::${lib_name}" &> /dev/null
 	then
-		extend $lib_name
+		eval "function shellbox::${lib_name}() {
+			run_library_command $lib_name \"\$@\"
+		}"
 	fi
 done
 
