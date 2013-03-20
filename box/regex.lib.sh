@@ -16,7 +16,7 @@
 # The blank line: $BL ("$SOL$SPACE*$EOL" by default)
 
 
-include 'shared'
+require 'shared'
 
 ## Define the global if not defined
 #
@@ -38,6 +38,24 @@ global_default EOL "◀"
 global_default EL "$SOL$EOL"
 global_default SPACE "[ 	]"
 global_default BL "$SOL$SPACE*$EOL"
+
+
+
+## Display a short help of the library or the help of the library command provided
+#
+# @param	[command_name]	The command name
+function regex::help() {
+	LIB_NAME='regex'
+	shared::help "$@"
+}
+
+
+## Display a detailed manual of the library.
+#
+function regex::man() {
+	LIB_NAME='regex'
+	shared::man
+}
 
 
 ## Match a regex in stdin or a file

@@ -10,9 +10,27 @@
 # - CMD_NAME: Invoked library command
 
 
-include 'shared'
+require 'shared'
 
 require 'cli'
+
+
+## Display a short help of the library or the help of the library command provided
+#
+# @param	[command_name]	The command name
+function sample::help() {
+	LIB_NAME='sample'
+	shared::help "$@"
+}
+
+
+## Display a detailed manual of the library.
+#
+function sample::man() {
+	LIB_NAME='sample'
+	shared::man
+}
+
 
 ## Default command
 # Default command cannot have parameters!

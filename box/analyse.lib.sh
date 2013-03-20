@@ -5,7 +5,7 @@
 # It source the regex library file.
 
 
-include 'shared'
+require 'shared'
 
 require 'cli'
 require 'regex'
@@ -40,6 +40,24 @@ function format() {
 	let "columns = console_width - columns"
 	# TODO : Find a better way to fold lines. (do not count escaped chars)
 	echo "$text" | fold -s -w $columns | sed -E "s/^(.*)$/$prefix\1/g"
+}
+
+
+
+## Display a short help of the library or the help of the library command provided
+#
+# @param	[command_name]	The command name
+function analyse::help() {
+	LIB_NAME='analyse'
+	shared::help "$@"
+}
+
+
+## Display a detailed manual of the library.
+#
+function analyse::man() {
+	LIB_NAME='analyse'
+	shared::man
 }
 
 

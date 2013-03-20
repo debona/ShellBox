@@ -24,8 +24,6 @@ SHELLBOX_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 ## Source the library file.
 # This mechanism rely on the `locate_library_file` function.
 # Return 1 if the file can't be sourced
-# It defines `SELF_NAME` and `SELF_FILE` which are available in the required library.
-# The global vars `SELF_NAME` and `SELF_FILE` are no longer available in the required library.
 #
 # @param	lib_name	The name of the library to source
 function require() {
@@ -47,28 +45,6 @@ function require() {
 	SELF_FILE="$old_file"
 
 	return $status
-}
-
-## Include all the commands available in the given library
-# This mechanism rely on the `require` and the `list_library_commands` functions.
-# Return 1 if the file can't be required
-#
-# @param	lib_name	The name of the library to include
-function include() {
-	local lib_name="$1"
-	locate_library_file "$lib_name" &> /dev/null || return 1
-
-	local _commands=$( list_library_commands $lib_name )
-	for _command in $_commands
-	do
-		if ! type "${SELF_NAME}::${_command}" &> /dev/null # Do not override the existing function
-		then
-			eval "function ${SELF_NAME}::${_command}() {
-				require $lib_name
-				${lib_name}::${_command} \"\$@\"
-			}"
-		fi
-	done
 }
 
 

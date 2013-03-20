@@ -4,12 +4,29 @@
 # This library allows to print on stderr and stdout with differents color schemes.
 
 
-include 'shared'
+require 'shared'
 
 
 ####################################################################
 ###########                  COMMANDS                    ###########
 ####################################################################
+
+## Display a short help of the library or the help of the library command provided
+#
+# @param	[command_name]	The command name
+function cli::help() {
+	LIB_NAME='cli'
+	shared::help "$@"
+}
+
+
+## Display a detailed manual of the library.
+#
+function cli::man() {
+	LIB_NAME='cli'
+	shared::man
+}
+
 
 ## Print the success of the given messages
 #

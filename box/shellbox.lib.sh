@@ -4,7 +4,7 @@
 # This is the main library as it provides you information about your shellbox install and all your library.
 
 
-include 'shared'
+require 'shared'
 
 TODOS_REGEX=".*TODO[ 	:]+(.*)"
 
@@ -18,6 +18,23 @@ TODOS_REGEX=".*TODO[ 	:]+(.*)"
 #
 function shellbox::() {
 	shellbox::status
+}
+
+
+## Display a short help of the library or the help of the library command provided
+#
+# @param	[command_name]	The command name
+function shellbox::help() {
+	LIB_NAME='shellbox'
+	shared::help "$@"
+}
+
+
+## Display a detailed manual of the library.
+#
+function shellbox::man() {
+	LIB_NAME='shellbox'
+	shared::man
 }
 
 
