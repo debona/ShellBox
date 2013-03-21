@@ -1,9 +1,6 @@
 #!/bin/bash
 #
 # Shared commands with all libraries
-# When you execute a library command, if the command is not found in the library, then the command is execute with this library (shared).
-# That means shared is always required before to execute your library commands.
-
 
 
 ####################################################################
@@ -12,18 +9,25 @@
 
 ## Display a short help of the library or the help of the library command provided
 #
-# @param	[command_name]	The command name
+# @param	lib_name	The library name
+# @param	[cmd_name]	The command name
 function shared::help() {
-	[[ -n $1 ]] && shared_command_help "$1" || shared_library_help
+	local lib_name="$1"
+	local cmd_name="$2"
+
+	[[ -n $cmd_name ]] && shared:-command_help "$lib_name" "$cmd_name" || shared:-library_help "$lib_name"
 }
 
 
 ## Display a detailed manual of the library.
 #
+# @param	lib_name	The library name
 function shared::man() {
-	require 'analyse'
+	local lib_name="$1"
+	local lib_file=$( locate_library_file "$lib_name" )
 
-	analyse::library_doc "$LIB_FILE" | less -R
+	require 'analyse'
+	analyse::library_doc "$lib_file" | less -R
 }
 
 
@@ -33,11 +37,15 @@ function shared::man() {
 
 ## Display a short help of the library. i.e. list of available commands with options
 #
-function shared_library_help() {
+# @param	lib_name	The library name
+function shared:-library_help() {
+	local lib_name="$1"
+	local lib_file=$( locate_library_file "$lib_name" )
+
 	require 'analyse'
 
-	local cmd_list=$( analyse::extract_commands $LIB_FILE)
-	local file_content=$( cat $LIB_FILE )
+	local cmd_list=$( analyse::extract_commands $lib_file)
+	local file_content=$( cat $lib_file )
 
 	echo "Available commands for this library:"
 
@@ -45,27 +53,32 @@ function shared_library_help() {
 	do
 		echo -n "    "
 		echo "$file_content" \
-			| analyse::function_raw_doc "${LIB_NAME}::${_command}" \
+			| analyse::function_raw_doc "${lib_name}::${_command}" \
 			| analyse::function_raw_input \
-			| analyse::function_synopsis "${boldon}${purplef}$LIB_NAME ${bluef}${_command}${reset}"
+			| analyse::function_synopsis "${boldon}${purplef}$lib_name ${bluef}${_command}${reset}"
 	done
 }
 
 ## Display the help of the library command.
 #
-# @param	command_name	the library command name
-function shared_command_help() {
+# @param	lib_name	The library name
+# @param	cmd_name	the library command name
+function shared:-command_help() {
+	local lib_name="$1"
+	local lib_file=$( locate_library_file "$lib_name" )
+	local cmd_name="$2"
+
 	require 'analyse'
 
-	local cmd_list=$( analyse::extract_commands $LIB_FILE)
-	local file_content=$( cat $LIB_FILE )
+	local cmd_list=$( analyse::extract_commands $lib_file)
+	local file_content=$( cat $lib_file )
 
-	if echo "$cmd_list" | egrep "^$1$" &> /dev/null
+	if echo "$cmd_list" | egrep "^${cmd_name}$" &> /dev/null
 	then
-		echo "$file_content" | analyse::command_doc "$LIB_NAME" "$1"
+		echo "$file_content" | analyse::command_doc "$lib_name" "$cmd_name"
 	else
 		cli::failure "This command does not exist:"
-		echo "	- ${boldon}${purplef}$LIB_NAME ${redf}$1${reset}"
+		echo "	- ${boldon}${purplef}$lib_name ${redf}$cmd_name${reset}"
 		return 1
 	fi
 }

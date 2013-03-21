@@ -25,16 +25,22 @@ function shellbox::() {
 #
 # @param	[command_name]	The command name
 function shellbox::help() {
-	LIB_NAME='shellbox'
-	shared::help "$@"
+	if [[ -z $1 ]]
+	then
+		shared::help 'shellbox'
+	elif locate_library_file "$1" &> /dev/null
+	then
+		shared::help "$@"
+	else
+		shared::help 'shellbox' "$@"
+	fi
 }
 
 
 ## Display a detailed manual of the library.
 #
 function shellbox::man() {
-	LIB_NAME='shellbox'
-	shared::man
+	[[ -n $1 ]] && shared::man "$1" || shared::man 'shellbox'
 }
 
 

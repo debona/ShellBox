@@ -19,16 +19,14 @@ require 'cli'
 #
 # @param	[command_name]	The command name
 function sample::help() {
-	LIB_NAME='sample'
-	shared::help "$@"
+	shared::help 'sample' "$@"
 }
 
 
 ## Display a detailed manual of the library.
 #
 function sample::man() {
-	LIB_NAME='sample'
-	shared::man
+	shared::man 'sample'
 }
 
 

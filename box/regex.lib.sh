@@ -45,16 +45,14 @@ global_default BL "$SOL$SPACE*$EOL"
 #
 # @param	[command_name]	The command name
 function regex::help() {
-	LIB_NAME='regex'
-	shared::help "$@"
+	shared::help 'regex' "$@"
 }
 
 
 ## Display a detailed manual of the library.
 #
 function regex::man() {
-	LIB_NAME='regex'
-	shared::man
+	shared::man 'regex'
 }
 
 

@@ -48,16 +48,14 @@ function format() {
 #
 # @param	[command_name]	The command name
 function analyse::help() {
-	LIB_NAME='analyse'
-	shared::help "$@"
+	shared::help 'analyse' "$@"
 }
 
 
 ## Display a detailed manual of the library.
 #
 function analyse::man() {
-	LIB_NAME='analyse'
-	shared::man
+	shared::man 'analyse'
 }
 
 

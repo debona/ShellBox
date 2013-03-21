@@ -15,15 +15,13 @@ require 'shared'
 #
 # @param	[command_name]	The command name
 function cli::help() {
-	LIB_NAME='cli'
-	shared::help "$@"
+	shared::help 'cli' "$@"
 }
 
 
 ## Display a detailed manual of the library.
 #
 function cli::man() {
-	LIB_NAME='cli'
 	shared::man
 }
 
