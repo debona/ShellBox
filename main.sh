@@ -3,6 +3,7 @@
 # Library command executer
 # This script execute library commands of a given library. It is the only script which can be execute.
 # The library name is given by $0, so you must create a symlink with the name of the library which target this script.
+# This trick is inspired by busybox.
 #
 # @param	command		The library command to run
 # @params	options		All the library command options
@@ -13,8 +14,12 @@
 ####################################################################
 
 SHELLBOX_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
+BOX_DIR='box'
 
-[[ ":$SHELLBOXES:" =~ ":$SHELLBOX_ROOT/box:" ]] || SHELLBOXES="$SHELLBOX_ROOT/box:$SHELLBOXES"
+# Ensure the `BOX_DIR` of this shellbox is present in `SHELLBOXES`.
+[[ ":$SHELLBOXES:" =~ ":$SHELLBOX_ROOT/$BOX_DIR:" ]] || SHELLBOXES="$SHELLBOXES:$SHELLBOX_ROOT/$BOX_DIR"
+
+unset BOX_DIR # Avoid to leak.
 
 
 ####################################################################
@@ -43,17 +48,18 @@ function require() {
 
 
 ## Find a library file across all directories present in SHELLBOXES.
-# It print the path of the last library file which match.
+# It print the path of the first library file which match (the same way as PATH).
 # Return 1 if the file can't be found in SHELLBOXES
 #
 # @param	lib_name	The name of the library to locate
 function locate_library_file() {
 	local lib_name="$1"
 	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
-	local fullpath=$( find $library_dirs -type f -name "${lib_name}.lib.sh" | tail -1 )
+	local fullpath=$( find $library_dirs -type f -name "${lib_name}.lib.sh" | head -1 )
 
 	[[ -n $fullpath ]] && echo "$fullpath" || return 1
 }
+
 
 ## List all library name which are available in SHELLBOXES
 #
@@ -61,6 +67,7 @@ function list_library_names() {
 	local library_dirs=$( echo $SHELLBOXES | tr ':' ' ' )
 	find $library_dirs -type f -name '*.lib.sh' -exec basename {} '.lib.sh' \; | sort -u
 }
+
 
 ## List all commands available in the given library
 #
@@ -78,6 +85,7 @@ function list_library_commands() {
 	fi
 	echo "$declared_func" | egrep "$reg" | sed -E "s/$reg//g"
 }
+
 
 ####################################################################
 ###########               PRIVATE FUNCTIONS              ###########
