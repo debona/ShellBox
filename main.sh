@@ -27,22 +27,16 @@ SHELLBOX_ROOT="$( cd -P "`dirname "$0"`/.." && pwd )"
 #
 # @param	lib_name	The name of the library to source
 function require() {
-	local old_name="$SELF_NAME"
-	local old_file="$SELF_FILE"
-
-	SELF_NAME="$1"
-	SELF_FILE=$( locate_library_file $SELF_NAME )
-
+	local lib_name="$1"
+	local lib_file=$( locate_library_file $lib_name )
 	local status=0
-	if ! source "$SELF_FILE"
+
+	if ! source "$lib_file"
 	then
 		status=$?
 		echo "$lib_name cannot be sourced from path:"
 		echo "SHELLBOXES=$SHELLBOXES"
 	fi
-
-	SELF_NAME="$old_name"
-	SELF_FILE="$old_file"
 
 	return $status
 }
@@ -112,32 +106,31 @@ function _command_function() {
 ## Run a library command with options.
 # This is the main function of shellbox.
 #
-# @param	LIB_NAME	the library name
-# @param	CMD_NAME	the command name
+# @param	lib_name	the library name
+# @param	cmd_name	the command name
 # @params	options		the options
 function run_library_command() {
-	# All this vars are reachable by the libraries
-	LIB_NAME="$1" # TODO: refactor the name of these var with something like: SELF_NAME, etc
-	LIB_FILE=$( locate_library_file ${LIB_NAME} )
-	CMD_NAME="$2"
-	shift # can't run `shift 2` because if there is only one arg, it fails
+	local lib_name="$1"
+	local cmd_name="$2"
+
+	shift # can't run `shift 2` because if there is only one arg, it doesn't shift at all
 	shift
 
-	require "${LIB_NAME}" || return 1
+	require "${lib_name}" || return 1
 
-	if _command_function "$LIB_NAME" "$CMD_NAME" &> /dev/null
+	if _command_function "$lib_name" "$cmd_name" &> /dev/null
 	then
 		# The library command exists
-		local cmd_function=$( _command_function "$LIB_NAME" "$CMD_NAME" )
+		local cmd_function=$( _command_function "$lib_name" "$cmd_name" )
 		$cmd_function "$@"
 	else
 		# The library command does not exist
 		# Display the error
 		require 'cli'
 		cli::failure "This command does not exist:"
-		echo "	- ${boldon}${purplef}$LIB_NAME ${redf}$CMD_NAME${reset}"
+		echo "	- ${boldon}${purplef}$lib_name ${redf}$cmd_name${reset}"
 		# Run the help command on the library
-		local cmd_function=$( _command_function "$LIB_NAME" "help" )
+		local cmd_function=$( _command_function "$lib_name" "help" )
 		$cmd_function
 		return 1
 	fi

@@ -5,9 +5,6 @@
 # ShellBox declare the following globals:
 # - SHELLBOX_ROOT: Root directory
 # - SHELLBOXES: libraries directory
-# - LIB_FILE: Loaded library file (i.e. path/to/sample.lib.sh)
-# - LIB_NAME: Loaded library name (i.e. sample)
-# - CMD_NAME: Invoked library command
 
 
 require 'shared'
