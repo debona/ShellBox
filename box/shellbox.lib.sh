@@ -23,7 +23,7 @@ function shellbox::() {
 
 ## Display a short help of the library or the help of the library command provided
 #
-# @param	[command_name]	The command name
+# @param {list_library_commands shellbox}	[command_name]	The command name
 function shellbox::help() {
 	if [[ -z $1 ]]
 	then
