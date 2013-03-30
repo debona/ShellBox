@@ -14,10 +14,8 @@ else
 fi
 
 # Put shellbox in path if needed
-if ! [[ ":$PATH:" =~ ":$SHELLBOX_ROOT/path:" ]]
-then
-	export PATH="$PATH:$SHELLBOX_ROOT/path"
-fi
+[[ ":$PATH:" =~ ":$SHELLBOX_ROOT/bin:" ]] || export PATH="$SHELLBOX_ROOT/bin:$PATH"
+
 
 # Put all parameters in SHELLBOXES
 SHELLBOXES="$SHELLBOX_ROOT/box"
@@ -34,5 +32,10 @@ export SHELLBOXES=$SHELLBOXES
 # Create shortcut for all library?
 shellbox shortcut all
 
-# TODO: enabled autocompletion shellbox shortcut all
-source "$SHELLBOX_ROOT/autocompletion.sh"
+if [[ -n "$BASH" ]]
+then
+	function __complete() {
+		COMPREPLY=( $( "$SHELLBOX_ROOT/bin/complete" dispatch "$COMP_CWORD" ${COMP_WORDS[@]} ) )
+	}
+	complete -o default -F __complete "shellbox"
+fi
