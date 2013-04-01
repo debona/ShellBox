@@ -139,6 +139,13 @@ function shellbox::unshortcut() {
 }
 
 
+## Sample library
+#
+# @params {complete::sublibrary $@}	options		sample library options
+function shellbox::sample() {
+	run_library_command "sample" "$@"
+}
+
 # This hack allow shellbox to get all libraries as shellbox commands
 for lib_name in `list_library_names`
 do
