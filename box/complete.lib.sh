@@ -17,7 +17,7 @@ require 'shared'
 # @params	words		the other words
 function complete::dispatch() {
 	local comp_count=$1
-	local lib_name="$2"   # first word of the line
+	local lib_name=$( basename "$2" '.lib.sh' )
 
 	local param_number=0
 	((param_number = comp_count + 2))
