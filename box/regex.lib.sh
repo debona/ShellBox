@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # Regex matching functions libraries.
 # All the regex commands rely on "line markers". When a file is read, the start and end of line are marked.

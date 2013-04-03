@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # A complete library file sample.
 # This file is sourced by shellbox each time.

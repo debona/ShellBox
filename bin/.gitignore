@@ -1,8 +1,0 @@
-# Ignore all files...
-*
-
-# ... but neither shellbox script
-!shellbox
-
-# ... nor this gitignore file
-!.gitignore

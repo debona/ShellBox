@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # Auto-completion commands library.
 

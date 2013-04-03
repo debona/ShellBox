@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # Shared commands with all libraries
 

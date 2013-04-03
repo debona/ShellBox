@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # libraries analysis
 # The main purpose of this library file is to provide needed functions to build up the libraries documentation.

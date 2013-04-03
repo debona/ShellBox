@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # Shellbox commands
 # This is the main library as it provides you information about your shellbox install and all your library.

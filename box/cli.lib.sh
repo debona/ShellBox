@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env shellbox
 #
 # UI shell script library
 # This library allows to print on stderr and stdout with differents color schemes.
