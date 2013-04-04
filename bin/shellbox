@@ -12,6 +12,8 @@
 ###########                 GLOBAL VARS                  ###########
 ####################################################################
 
+SHELLBOX_EXT=${SHELLBOX_EXT:-'.lib.sh'}
+
 LIB_DIR="$( cd -P "`dirname "$1"`" && pwd )"
 
 # Ensure the `LIB_DIR` is present in `PATH`.
@@ -53,7 +55,7 @@ function require() {
 function locate_library_file() {
 	local lib_name="$1"
 	local library_dirs=$( echo $PATH | tr ':' ' ' )
-	local fullpath=$( find $library_dirs -maxdepth 1 -type f -name "${lib_name}.lib.sh" 2> /dev/null | head -1 )
+	local fullpath=$( find $library_dirs -maxdepth 1 -type f -name "${lib_name}${SHELLBOX_EXT}" 2> /dev/null | head -1 )
 
 	[[ -n $fullpath ]] && echo "$fullpath" || return 1
 }
@@ -63,7 +65,7 @@ function locate_library_file() {
 #
 function list_library_names() {
 	local library_dirs=$( echo $PATH | tr ':' ' ' )
-	find $library_dirs -maxdepth 1 -type f -name '*.lib.sh' -exec basename {} '.lib.sh' \; 2> /dev/null | sort -u
+	find $library_dirs -maxdepth 1 -type f -name "*${SHELLBOX_EXT}" -exec basename {} "${SHELLBOX_EXT}" \; 2> /dev/null | sort -u
 }
 
 
@@ -149,7 +151,7 @@ function run_library_command() {
 
 if [[ -r "$1" ]]
 then
-	__lib_name=$( basename "$1" ".lib.sh" )
+	__lib_name=$( basename "$1" "${SHELLBOX_EXT}" )
 	shift
 
 	run_library_command "${__lib_name}" "$@"

@@ -91,7 +91,7 @@ function analyse::function_raw_doc() {
 # @param	file	the library file to analyse
 function analyse::extract_commands() {
 	# TODO: refactor the function to list only declared function
-	list_library_commands `basename "$1" .lib.sh `
+	list_library_commands `basename "$1" "${SHELLBOX_EXT}" `
 }
 
 
@@ -146,7 +146,7 @@ function analyse::command_doc() {
 	if [[ -t 0 ]]
 	then
 		file_content=$( cat "$1" )
-		lib_name="$(basename "$1" .lib.sh)"
+		lib_name="$(basename "$1" "${SHELLBOX_EXT}")"
 	else
 		file_content=$( cat )
 		lib_name="$1"
@@ -179,7 +179,7 @@ function analyse::command_doc() {
 # @param	lib_file	the library file
 function analyse::library_doc() {
 	local lib_file="$1"
-	local lib_name=$(basename $lib_file .lib.sh)
+	local lib_name=$(basename "$lib_file" "${SHELLBOX_EXT}")
 
 	local file_content=$( cat "$lib_file" )
 
