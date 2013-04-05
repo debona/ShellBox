@@ -21,7 +21,7 @@ fi
 if [[ -n "$BASH" ]]
 then
 	function __complete() {
-		COMPREPLY=( $( complete.lib.sh dispatch "$COMP_CWORD" ${COMP_WORDS[@]} ) )
+		COMPREPLY=( $( complete.sb dispatch "$COMP_CWORD" ${COMP_WORDS[@]} ) )
 	}
-	complete -o bashdefault -o default -F __complete `shellbox list_library_names | sed 's/$/.lib.sh/'`
+	complete -o bashdefault -o default -F __complete `shellbox list_library_names | sed 's/$/.sb/'`
 fi
