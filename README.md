@@ -17,3 +17,19 @@ If you spend much time on unix consoles in your developer's life, you probably b
     - Easily create a command that generates a "manual" from your code documentation.
     - Enjoy the `bash` and `zsh` completions of commands and options.
 
+
+## Getting started
+
+### Installation
+
+	git clone git@github.com:FooPixel/ShellBox.git ShellBox
+	cd ShellBox
+	export PATH="`pwd`/bin:$PATH" # make the shellbox libraries executable
+	export PATH="`pwd`/box:$PATH" # make the libraries of this shellbox available in your PATH
+
+ShellBox is now ready for your current shell session.
+To get it automatically available in all your shell sessions, add the PATH configuration to your `.profile` file.
+
+	echo "export PATH=\"`pwd`/bin:\$PATH\"" >> ~/.profile
+	echo "export PATH=\"`pwd`/box:\$PATH\"" >> ~/.profile
+
