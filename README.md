@@ -78,10 +78,10 @@ Make `print.sb` executable: `chmod 755 print.sb`
 
 Now you can execute `print` commands:
 
-	$ print.sb warning This is a warning message, printed on stderr
+	$ ./print.sb warning This is a warning message, printed on stderr
 	 ⚑ This is a warning message, printed on stderr
 
-	$ print.sb item `seq 1 10`
+	$ ./print.sb item `seq 1 10`
 	 ● 1 2 3 4 5 6 7 8 9 10
 
 
@@ -138,7 +138,7 @@ Make `complex.sb` executable: `chmod 755 complex.sb`
 
 Now you can execute `complex` commands:
 
-	$ complex.sb print `seq 1 10`
+	$ ./complex.sb print `seq 1 10`
 	 ● 1
 	 ● 2
 	 ● 3
@@ -150,7 +150,7 @@ Now you can execute `complex` commands:
 	 ● 9
 	 ● 10
 
-	$ complex.sb help
+	$ ./complex.sb help
 	Available commands for this library:
 	    complex help [command_name]
 	    complex man
