@@ -84,3 +84,75 @@ Now you can execute `print` commands:
 	$ print.sb item `seq 1 10`
 	 ● 1 2 3 4 5 6 7 8 9 10
 
+
+#### complex.sb
+
+This library is an example of a library that rely on other's commands libraries. The `complexe.sb` library require our `print.sb` library and the `shared` library.
+
+`complex.sb`:
+
+	#!/usr/bin/env shellbox
+	#
+	# A complex library.
+	# It's purpose is to illustrate how it's easy to share commands between libraries.
+
+	require 'print' # that means the complex library rely on the `print.sb` library
+
+	# COMMANDS:
+
+	## Print each parameter in one line.
+	#
+	# @params	args	The params to print
+	function complex::print() {
+		if [[ $# -lt 1 ]]
+		then
+			print::warning "There is no parameters" # assume the warning command print the message on stderr and return 1
+		else
+			complex_print_array "$@"
+		fi
+	}
+
+
+	## Display a short help of the library or the help of the library command provided
+	#
+	# @param	[command_name]	The command name
+	function complex::help() {
+		require 'shared'
+		shared::help 'complex' "$@"
+	}
+
+
+	# PRIVATE FUNCTIONS:
+
+	## Print all the given params separated with the delimiter
+	#
+	# @param	args		The parameters
+	function complex_print_array() {
+		for param in "$@"
+		do
+			print::item "$param"
+		done
+	}
+
+Make `complex.sb` executable: `chmod 755 complex.sb`
+
+Now you can execute `complex` commands:
+
+	$ complex.sb print `seq 1 10`
+	 ● 1
+	 ● 2
+	 ● 3
+	 ● 4
+	 ● 5
+	 ● 6
+	 ● 7
+	 ● 8
+	 ● 9
+	 ● 10
+
+	$ complex.sb help
+	Available commands for this library:
+	    complex help [command_name]
+	    complex man
+	    complex print args*
+
