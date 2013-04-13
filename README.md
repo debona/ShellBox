@@ -22,17 +22,20 @@ If you spend much time on unix consoles in your developer's life, you probably b
 
 ### Installation
 
-	git clone git@github.com:FooPixel/ShellBox.git ShellBox
-	cd ShellBox
-	export PATH="`pwd`/bin:$PATH" # make the shellbox libraries executable
-	export PATH="`pwd`/box:$PATH" # make the libraries of this shellbox available in your PATH
+```sh
+git clone git@github.com:FooPixel/ShellBox.git ShellBox
+cd ShellBox
+export PATH="`pwd`/bin:$PATH" # make the shellbox libraries executable
+export PATH="`pwd`/box:$PATH" # make the libraries of this shellbox available in your PATH
+```
 
 ShellBox is now ready for your current shell session.
 To get it automatically available in all your shell sessions, add the PATH configuration to your `.profile` file.
 
-	echo "export PATH=\"`pwd`/bin:\$PATH\"" >> ~/.profile
-	echo "export PATH=\"`pwd`/box:\$PATH\"" >> ~/.profile
-
+```sh
+echo "export PATH=\"`pwd`/bin:\$PATH\"" >> ~/.profile
+echo "export PATH=\"`pwd`/box:\$PATH\"" >> ~/.profile
+```
 
 ### Create your commands library
 
@@ -40,39 +43,41 @@ To get it automatically available in all your shell sessions, add the PATH confi
 
 The first library allows you to print colored messages in shell console. The library print colors *iff* it's called in an interactive console.
 
-	#!/usr/bin/env shellbox
-	#
-	# A console print library.
-	# It's purpose is to illustrate how ShellBox is fun.
+```sh
+#!/usr/bin/env shellbox
+#
+# A console print library.
+# It's purpose is to illustrate how ShellBox is fun.
 
 
-	# The following lines are executed when this library is required or executed.
-	if [[ -t 1 ]] && [[ -t 2 ]] # if stdout and stderr are tty, then define colors
-	then
-		esc=""
-		reset="${esc}[0m"
-		cyanf="${esc}[36m"
-		yellowf="${esc}[33m"
-	fi
+# The following lines are executed when this library is required or executed.
+if [[ -t 1 ]] && [[ -t 2 ]] # if stdout and stderr are tty, then define colors
+then
+	esc=""
+	reset="${esc}[0m"
+	cyanf="${esc}[36m"
+	yellowf="${esc}[33m"
+fi
 
 
-	# COMMANDS:
+# COMMANDS:
 
-	## Print a warning message on stderr.
-	# The parameters are printed in yellow and prefixed with ` ⚑ `.
-	#
-	# @params	args	The warning message
-	function print::warning() {
-		echo "${yellowf} ⚑ $@${reset}" >&2
-	}
+## Print a warning message on stderr.
+# The parameters are printed in yellow and prefixed with ` ⚑ `.
+#
+# @params	args	The warning message
+function print::warning() {
+	echo "${yellowf} ⚑ $@${reset}" >&2
+}
 
-	## Print an item on stdout.
-	# The parameters are printed in cyan and prefixed with ` ● `.
-	#
-	# @params	args	The item to print
-	function print::item() {
-		echo "${cyanf} ● $@${reset}"
-	}
+## Print an item on stdout.
+# The parameters are printed in cyan and prefixed with ` ● `.
+#
+# @params	args	The item to print
+function print::item() {
+	echo "${cyanf} ● $@${reset}"
+}
+```
 
 Make `print.sb` executable: `chmod 755 print.sb`
 
@@ -91,48 +96,57 @@ This library is an example of a library that rely on other's commands libraries.
 
 `complex.sb`:
 
-	#!/usr/bin/env shellbox
-	#
-	# A complex library.
-	# It's purpose is to illustrate how it's easy to share commands between libraries.
+```sh
+#!/usr/bin/env shellbox
+#
+# A complex library.
+# It's purpose is to illustrate how to rely on other's libraries.
 
-	require 'print' # that means the complex library rely on the `print.sb` library
+require 'print' # that means the complex library rely on the `print.sb` library
 
-	# COMMANDS:
+# COMMANDS:
 
-	## Print each parameter in one line.
-	#
-	# @params	args	The params to print
-	function complex::print() {
-		if [[ $# -lt 1 ]]
-		then
-			print::warning "There is no parameters" # assume the warning command print the message on stderr and return 1
-		else
-			complex_print_array "$@"
-		fi
-	}
-
-
-	## Display a short help of the library or the help of the library command provided
-	#
-	# @param	[command_name]	The command name
-	function complex::help() {
-		require 'shared'
-		shared::help 'complex' "$@"
-	}
+## Print each parameter in one line.
+#
+# @params	args	The params to print
+function complex::print() {
+	if [[ $# -lt 1 ]]
+	then
+		print::warning "There is no parameters"
+	else
+		complex_print_array "$@"
+	fi
+}
 
 
-	# PRIVATE FUNCTIONS:
+## Display a short help of the library or the help of the library command provided
+#
+# @param	[command_name]	The command name
+function complex::help() {
+	require 'shared' # a library can be required everywhere
+	shared::help 'complex' "$@"
+}
 
-	## Print all the given params separated with the delimiter
-	#
-	# @param	args		The parameters
-	function complex_print_array() {
-		for param in "$@"
-		do
-			print::item "$param"
-		done
-	}
+## Display a detailed manual of the library.
+#
+function complex::man() {
+	require 'shared'
+	shared::man 'complex'
+}
+
+
+# PRIVATE FUNCTIONS:
+
+## Print all the given params separated with the delimiter
+#
+# @param	args		The parameters
+function complex_print_array() {
+	for param in "$@"
+	do
+		print::item "$param"
+	done
+}
+```
 
 Make `complex.sb` executable: `chmod 755 complex.sb`
 
