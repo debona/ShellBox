@@ -39,9 +39,11 @@ echo "export PATH=\"`pwd`/box:\$PATH\"" >> ~/.profile
 
 ### Create your commands library
 
-#### print.sb
+#### Basic library example
 
 The first library allows you to print colored messages in shell console. The library print colors *iff* it's called in an interactive console.
+
+`print.sb`:
 
 ```sh
 #!/usr/bin/env shellbox
@@ -68,14 +70,14 @@ function print::warning() {
 
 Make `print.sb` executable: `chmod 755 print.sb`
 
-Now you can execute `print` commands:
+Now you can execute `print` commands in your console:
 
 ```sh
 $ ./print.sb warning "printed on stderr" 1> /dev/null
  ⚑ printed on stderr
 ```
 
-#### complex.sb
+#### Advanced library example
 
 This library is an example of a library that rely on other's commands libraries. The `complexe.sb` library require our `print.sb` library and the `shared` library.
 
@@ -126,7 +128,7 @@ function complex_print_list() {
 
 Make `complex.sb` executable: `chmod 755 complex.sb`
 
-Now you can execute `complex` commands:
+Now you can execute `complex` commands in your console:
 
 	$ complex.sb print `seq 1 3`
 	 ● 1
