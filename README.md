@@ -140,3 +140,21 @@ Now you can execute `complex` commands in your console:
 	    complex help [command_name]
 	    complex print args*
 
+
+## How does it work?
+
+Every **libraries** are executed through the `shellbox` **library interpreter**. This *interpreter* define few functions and then execute the given library command.
+
+#### What happen when you execute a library command?
+
+1. Your shell reads the first line of your script (the shebang) and runs the `shellbox` lib interpreter (with your lib as parameter).
+2. The interpreter declares few functions. The most important function is the **require** function.
+3. The interpreter calls the **require** function on your library. The most important thing this function does is sourcing your library.
+4. The interpreter looks for a function like `your_lib::the_command` to call, and then call it.
+
+
+#### How does the require function look for libraries?
+
+1. The **require** function look for the `*.sb` files present in your `PATH`.
+2. The first library that match the given library name is taken.
+
