@@ -23,7 +23,7 @@ If you spend much time on unix consoles in your developer's life, you probably b
 ### Installation
 
 ```sh
-git clone git@github.com:FooPixel/ShellBox.git ShellBox
+git clone git@github.com:debona/ShellBox.git ShellBox
 cd ShellBox
 export PATH="`pwd`/bin:$PATH" # make the shellbox libraries executable
 export PATH="`pwd`/box:$PATH" # make the libraries of this shellbox available in your PATH
