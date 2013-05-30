@@ -147,7 +147,7 @@ Every **libraries** are executed through the `shellbox` **library interpreter**.
 
 #### What happen when you execute a library command?
 
-1. Your shell reads the first line of your script (the shebang) and runs the `shellbox` lib interpreter (with your lib as parameter).
+1. Your shell reads the first line of your script (the shebang) and runs the `shellbox` lib interpreter (with the lib as a parameter).
 2. The interpreter declares few functions. The most important function is the **require** function.
 3. The interpreter calls the **require** function on your library. The most important thing this function does is sourcing your library.
 4. The interpreter looks for a function like `your_lib::the_command` to call, and then call it.
@@ -155,6 +155,6 @@ Every **libraries** are executed through the `shellbox` **library interpreter**.
 
 #### How does the require function look for libraries?
 
-1. The **require** function look for the `*.sb` files present in your `PATH`.
-2. The first library that match the given library name is taken.
+1. The **require** function look for the `*.sb` files available through your `PATH` environment var.
+2. The function select the first library that match the given name.
 
