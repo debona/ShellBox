@@ -158,3 +158,8 @@ Every **libraries** are executed through the `shellbox` **library interpreter**.
 1. The **require** function look for the `*.sb` files available through your `PATH` environment var.
 2. The function select the first library that match the given name.
 
+### Actual limitations
+
+- The `shellbox` *binary* must be in your `PATH` when you run a library command.
+    - By the way, this command will work: `PATH="path/to/shellbox/bin:$PATH" my/libs/foo.sb`
+
