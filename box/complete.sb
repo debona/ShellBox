@@ -34,7 +34,7 @@ function complete::dispatch() {
 
 			complete::option "$option_number" "$lib_name" "$@"
 		fi
-	} 2> /dev/null | egrep "^$current"
+	} 2> /dev/null | tr ' ' "\n" | egrep "^$current"
 }
 
 
