@@ -24,4 +24,17 @@ then
 		COMPREPLY=( $( complete.sb dispatch "$COMP_CWORD" ${COMP_WORDS[@]} ) )
 	}
 	complete -o bashdefault -o default -F __complete `shellbox list_library_names | sed 's/$/.sb/'`
+else
+	autoload -U compinit
+	compinit -i
+
+	function __complete() {
+		local params
+		read -cA params
+		local parameter_count="${#params}"
+		((parameter_count=parameter_count-1))
+
+		reply=( $( complete.sb dispatch $parameter_count ${params[@]} ) )
+	}
+	compctl -K __complete `shellbox list_library_names | sed 's/$/.sb/'`
 fi

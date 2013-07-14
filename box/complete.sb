@@ -25,7 +25,7 @@ function complete::dispatch() {
 	shift 2
 
 	{
-		if [[ $comp_count -eq 1 ]] # the user is currently completing the cmd_name (parameter #2)
+		if [[ $comp_count -lt 2 ]] # the user is currently completing the cmd_name (parameter #2)
 		then
 			complete::commands "$lib_name"
 		else # comp_count >= 2
