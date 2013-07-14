@@ -30,11 +30,18 @@ unset LIB_DIR # Avoid to leak.
 # This mechanism rely on the `locate_library_file` function.
 # Return 1 if the file can't be sourced
 #
-# @param	lib_name	The name of the library to source
+# @param	lib_name_or_file	the library name or path to a library file to source
 function require() {
 	local lib_name="$1"
-	local lib_file=$( locate_library_file $lib_name )
 	local status=0
+
+	if [[ -x $lib_name ]]
+	then
+		local lib_file="$lib_name"
+	else
+		lib_name=$( basename_auto "$lib_name" )
+		local lib_file=$( locate_library_file $lib_name )
+	fi
 
 	if ! source "$lib_file"
 	then
@@ -91,6 +98,15 @@ function list_library_commands() {
 ###########               PRIVATE FUNCTIONS              ###########
 ####################################################################
 
+## Prints the name of the file, without any extension.
+#
+# @param	file	The file
+function basename_auto() {
+	local name=$( basename "$1" )
+	echo "${name%%.*}"
+}
+
+
 ## Print the command function for the given library and command.
 # Return 1 if the command does not exist.
 #
@@ -114,17 +130,19 @@ function _command_function() {
 ## Run a library command with options.
 # This is the main function of shellbox.
 #
-# @param	lib_name	the library name
-# @param	cmd_name	the command name
-# @params	options		the options
+# @param	lib_name_or_file	the library name or path to a library file
+# @param	cmd_name			the command name
+# @params	options				the options
 function run_library_command() {
-	local lib_name="$1"
+	local lib_name_or_file="$1"
 	local cmd_name="$2"
 
 	shift # can't run `shift 2` because if there is only one arg, it doesn't shift at all
 	shift
 
-	require "${lib_name}" || return 1
+	require "${lib_name_or_file}" || return 1
+
+	local lib_name=$( basename_auto "$lib_name_or_file" )
 
 	if _command_function "$lib_name" "$cmd_name" &> /dev/null
 	then
@@ -151,10 +169,7 @@ function run_library_command() {
 
 if [[ -r "$1" ]]
 then
-	__lib_name=$( basename "$1" "${SHELLBOX_EXT}" )
-	shift
-
-	run_library_command "${__lib_name}" "$@"
+	run_library_command "$@"
 elif type "$1" &> /dev/null
 then
 	"$@"
