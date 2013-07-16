@@ -12,11 +12,11 @@ require 'shared'
 
 ## autocompletion function called when TAB key is pressed
 #
-# @param	comp_count	the number of completed "words"
-# @param	lib_name	the library name
+# @param	comp_count			the number of completed "words"
+# @param	lib_name_or_file	the library name or file name
 function complete::dispatch() {
 	local comp_count=$1
-	local lib_name=$( basename "$2" '.sb' )
+	local lib_name=$( basename_auto "$2" )
 
 	local param_number=0
 	((param_number = comp_count + 2))

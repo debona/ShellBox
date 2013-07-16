@@ -12,8 +12,6 @@
 ###########                 GLOBAL VARS                  ###########
 ####################################################################
 
-SHELLBOX_EXT=${SHELLBOX_EXT:-'.sb'}
-
 LIB_DIR="$( cd -P "`dirname "$1"`" && pwd )"
 
 # Ensure the `LIB_DIR` is present in `PATH`.
@@ -62,17 +60,27 @@ function require() {
 function locate_library_file() {
 	local lib_name="$1"
 	local library_dirs=$( echo $PATH | tr ':' ' ' )
-	local fullpath=$( find $library_dirs -maxdepth 1 -type f -name "${lib_name}${SHELLBOX_EXT}" 2> /dev/null | head -1 )
+	local fullpath=$( find $library_dirs -maxdepth 1 -type f -regex ".*/${lib_name}[\.a-zA-Z]*" 2> /dev/null | head -1 )
 
 	[[ -n $fullpath ]] && echo "$fullpath" || return 1
 }
 
 
-## List all library name which are available in PATH
+## List all library file names which are available in PATH
+#
+function list_libraries() {
+	local library_dirs=$( echo $PATH | tr ':' ' ' )
+	local possible_file=$( find $library_dirs -maxdepth 1 -type f )
+	grep --binary-file=without-match --files-with-matches '^#!/usr/bin/env shellbox$' $possible_file \
+		| xargs -n 1 -J {} awk '{ if ( NR == 1 && $0 ~ "^#!/usr/bin/env shellbox$") { print FILENAME; exit 0; } else { exit 1; } }' {} \
+		| sed -E 's:.*/([^/]+)$:\1:g' | sort -u
+} 2> /dev/null
+
+
+## List all library names which are available in PATH
 #
 function list_library_names() {
-	local library_dirs=$( echo $PATH | tr ':' ' ' )
-	find $library_dirs -maxdepth 1 -type f -name "*${SHELLBOX_EXT}" -exec basename {} "${SHELLBOX_EXT}" \; 2> /dev/null | sort -u
+	list_libraries | sed -E 's:([^\.]+)(\..*):\1:g'
 }
 
 
