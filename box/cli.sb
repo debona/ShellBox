@@ -58,6 +58,14 @@ function cli::step() {
 	echolor "${cyanf} ● " "$@"
 }
 
+## Print command before run it
+# Allow to do: 'verbose command option && verbose something else'
+#
+# @params	command_or_options	All the parameters are interpreted as command and its options
+function cli::verbose() {
+	cli::step "$@"
+	"$@"
+}
 
 ####################################################################
 ###########              PRIVATE FUNCTIONS               ###########
@@ -73,25 +81,6 @@ function echolor() {
 	local first=$2
 	shift 2
 	echo -e "${boldon}${color}$first${reset} $@"
-}
-
-## Print command before run it
-# Allow to do: 'verbose command option && verbose something else'
-#
-#* all parameters are interpreted as command and its options
-function verbose() {
-	step "$@"
-
-	# exec the line
-	if "$@"
-	then
-		success "$@"
-		return 0
-	else
-		status=$? # remember the exit status
-		failure "$@"
-		return $status
-	fi
 }
 
 ## Define colors.
